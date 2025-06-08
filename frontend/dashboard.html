@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Vendraly</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p8f8Xy2WhDMjLYsGcQJzuVl+NW6RxjnkRre0biUO9NLxFsg8ZHt+fwzEZOqyL1Fp1CaAStmZ8+SqmG4lT9B+xA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+<header>
+    <h1><i class="fas fa-seedling"></i> Vendraly</h1>
+    <nav>
+        <a href="index.html">Proyectos</a>
+        <a href="novo-projeto.html">Publicar</a>
+        <a href="login.html">Salir</a>
+    </nav>
+</header>
+<div class="container">
+    <h2>Dashboard</h2>
+    <div id="projetos"></div>
+</div>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+    fetch(`${API_URL}/projetos`).then(r=>r.json()).then(data=>{
+        const c=document.getElementById('projetos');
+        data.forEach(p=>{
+            const d=document.createElement('div');
+            d.className='proyecto';
+            d.innerHTML=`<strong>${p.titulo}</strong> - <a href='detalhes.html?id=${p.id}'>Ver</a>`;
+            c.appendChild(d);
+        })
+    });
+</script>
+</body>
+</html>
