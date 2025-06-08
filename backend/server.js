@@ -1,11 +1,12 @@
 const express = require('express');
 const path = require('path');
+const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('data.db');
+const db = new sqlite3.Database(path.join(__dirname, 'data.db'));
 
 const app = express();
+app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 
 // create tables if not exist
 const initSql = `CREATE TABLE IF NOT EXISTS usuarios (
