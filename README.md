@@ -2,13 +2,12 @@
 
 Plataforma de microinversiones colaborativas.
 
-## Uso
+## Backend
 
-Instala dependencias e inicia el servidor:
+El backend está hecho con Node.js, Express y SQLite.
+
+### Cómo ejecutar:
 
 ```bash
 npm install
 node server.js
-```
-
-Accede a `http://localhost:3000/index.html` para ver los proyectos.
