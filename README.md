@@ -1,10 +1,26 @@
 # Vendraly
 
-Este repositorio contiene un ejemplo simple de la interfaz principal usando solo HTML, CSS y JavaScript. Puede subirse a cualquier hosting estático.
+Este repositorio contiene un prototipo de plataforma de microinversiones colaborativas que conecta inversores con emprendedores locales.
 
-## Archivos
-- `index.html` - página principal con las secciones de proyectos.
-- `css/style.css` - estilos modernos con gradientes y diseño responsivo.
-- `js/app.js` - código JavaScript para la navegación móvil y carga de proyectos.
+## Frontend
 
-Los datos de los proyectos están en la variable `projects` dentro de `app.js`. En un hosting con PHP, podrías cargar esos datos desde una base de datos MySQL y generar la página usando includes para el `header` y `footer`.
+- `index.html` – Página principal con los proyectos disponibles.
+- `css/style.css` – Estilos modernos con gradientes y diseño responsivo.
+- `js/app.js` – Código JavaScript para la navegación y carga de proyectos.
+
+Puedes subirlo a un hosting estático o usarlo con un backend en PHP/MySQL.
+
+## Backend
+
+Se incluyen scripts PHP para autenticación básica:
+
+- `php/register.php` – Registro de usuarios con foto de perfil y documentos.
+- `php/login.php` – Inicio de sesión seguro con contraseñas encriptadas.
+- `php/config.php` – Configuración de conexión a MySQL (por defecto: root/ sin contraseña).
+- `uploads/` – Carpeta para fotos de perfil y documentos (crear manualmente).
+
+### Tablas necesarias en MySQL (ejecutar en phpMyAdmin)
+
+```sql
+CREATE DATABASE vendraly;
+-- y luego las tablas de usuarios, proyectos e inversiones
