@@ -1,24 +1,26 @@
 # Vendraly
 
-Prototipo de plataforma de microinversiones colaborativas.
+Este repositorio contiene un prototipo de plataforma de microinversiones colaborativas que conecta inversores con emprendedores locales.
 
-Este repositorio contiene un ejemplo simple de la interfaz principal usando solo HTML, CSS y JavaScript. Puede subirse a cualquier hosting estático.
+## Frontend
 
-## Archivos
-- `index.html` - página principal con las secciones de proyectos.
-- `css/style.css` - estilos modernos con gradientes y diseño responsivo.
-- `js/app.js` - código JavaScript para la navegación móvil y carga de proyectos.
+- `index.html` – Página principal con los proyectos disponibles.
+- `css/style.css` – Estilos modernos con gradientes y diseño responsivo.
+- `js/app.js` – Código JavaScript para la navegación y carga de proyectos.
 
-Los datos de los proyectos están en la variable `projects` dentro de `app.js`. En un hosting con PHP, podrías cargar esos datos desde una base de datos MySQL y generar la página usando includes para el `header` y `footer`.
+Puedes subirlo a un hosting estático o usarlo con un backend en PHP/MySQL.
 
-## Autenticación básica en PHP
+## Backend
 
-Se añadieron scripts en `php/` para un sistema inicial de registro y login usando MySQL.
+Se incluyen scripts PHP para autenticación básica:
 
-1. Copia el archivo `php/config.php` y ajusta las credenciales de tu base de datos.
-2. Crea una base `vendraly` y ejecuta las sentencias de las tablas en la descripción del proyecto.
-3. Coloca la carpeta en un servidor con PHP 7.4+ (XAMPP, etc.).
-4. Accede a `php/register.php` para crear un usuario y luego ingresa en `php/login.php`.
+- `php/register.php` – Registro de usuarios con foto de perfil y documentos.
+- `php/login.php` – Inicio de sesión seguro con contraseñas encriptadas.
+- `php/config.php` – Configuración de conexión a MySQL (por defecto: root/ sin contraseña).
+- `uploads/` – Carpeta para fotos de perfil y documentos (crear manualmente).
 
-Las imágenes subidas se guardan en la carpeta `uploads/` y no se incluyen en el repositorio.
+### Tablas necesarias en MySQL (ejecutar en phpMyAdmin)
 
+```sql
+CREATE DATABASE vendraly;
+-- y luego las tablas de usuarios, proyectos e inversiones

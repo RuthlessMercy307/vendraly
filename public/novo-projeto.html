@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Proyecto</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <h1>Publicar Proyecto</h1>
+    <form id="projForm">
+        <input type="text" name="titulo" placeholder="Título" required>
+        <textarea name="descricao" placeholder="Descripción"></textarea>
+        <input type="number" step="0.01" name="valor_meta" placeholder="Meta" required>
+        <input type="number" step="0.01" name="retorno_percentual" placeholder="Retorno %" required>
+        <input type="number" name="prazo_meses" placeholder="Plazo meses" required>
+        <button type="submit">Publicar</button>
+    </form>
+    <script>
+        document.getElementById('projForm').addEventListener('submit',async e=>{
+            e.preventDefault();
+            const data=Object.fromEntries(new FormData(e.target).entries());
+            const r=await fetch('/novo-projeto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+            if(r.ok) location.href='dashboard.html'; else alert('Erro ao criar');
+        });
+    </script>
+</body>
+</html>

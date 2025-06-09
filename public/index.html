@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendraly - Proyectos</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <h1>Proyectos Disponibles</h1>
+    <div id="lista-proyectos"></div>
+    <script src="js/app.js"></script>
+    <script>
+        fetch('/projetos').then(r=>r.json()).then(data=>{
+            const cont=document.getElementById('lista-proyectos');
+            data.forEach(p=>{
+                const div=document.createElement('div');
+                div.className='proyecto';
+                div.innerHTML=`<h2>${p.titulo}</h2><p>${p.descricao}</p><a href="detalhes.html?id=${p.id}">Ver detalles</a>`;
+                cont.appendChild(div);
+            })
+        });
+    </script>
+</body>
+</html>
