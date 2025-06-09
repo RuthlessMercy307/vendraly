@@ -247,8 +247,8 @@ function handleRegister(e) {
   e.preventDefault();
   const form = e.target;
   const nombre = form.querySelector('input[type="text"]').value;
-  const email = form.querySelectorAll('input[type="email"]')[1].value;
-  const password = form.querySelectorAll('input[type="password"]')[1].value;
+  const email = form.querySelector('input[type="email"]').value;
+  const password = form.querySelector('input[type="password"]').value;
 
   fetch('php/register.php', {
     method: 'POST',
@@ -263,6 +263,7 @@ function handleRegister(e) {
       }
     });
 }
+
 
 function handleLogin(e) {
   e.preventDefault();
