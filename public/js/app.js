@@ -233,26 +233,6 @@ function closeModal() {
   document.getElementById('authModal').classList.add('hidden');
 }
 
-function handleLogin(event) {
-  event.preventDefault();
-
-  // Aquí iría tu validación real (correo, contraseña...)
-  // Por ahora lo simulamos
-  const email = document.querySelector('.auth-form input[type="email"]').value;
-  const pass = document.querySelector('.auth-form input[type="password"]').value;
-
-  if (email && pass) {
-    // Guardar como "logueado" (ejemplo temporal)
-    sessionStorage.setItem('usuarioLogueado', '1');
-
-    const destino = sessionStorage.getItem('postLoginRedirect') || 'dashboard.html';
-    sessionStorage.removeItem('postLoginRedirect');
-    window.location.href = destino;
-  } else {
-    alert("Completa los campos para continuar");
-  }
-}
-
 function switchToRegister() {
   document.getElementById('loginForm').classList.add('hidden');
   document.getElementById('registerForm').classList.remove('hidden');
@@ -263,22 +243,60 @@ function switchToLogin() {
   document.getElementById('loginForm').classList.remove('hidden');
 }
 
-function handleRegister(event) {
-  event.preventDefault();
-  const form = event.target;
-  const name = form.querySelector('input[type="text"]').value;
+function handleRegister(e) {
+  e.preventDefault();
+  const form = e.target;
+  const nombre = form.querySelector('input[type="text"]').value;
+  const email = form.querySelectorAll('input[type="email"]')[1].value;
+  const password = form.querySelectorAll('input[type="password"]')[1].value;
+
+  fetch('php/register.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ nombre, email, telefono: '000000000', password })
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.msg);
+      if (data.status === 'ok') {
+        switchToLogin();
+      }
+    });
+}
+
+function handleLogin(e) {
+  e.preventDefault();
+  const form = e.target;
   const email = form.querySelector('input[type="email"]').value;
   const password = form.querySelector('input[type="password"]').value;
 
-  if (name && email && password) {
-    alert(`¡Bienvenido ${name}! (registro simulado)`);
+  fetch('php/login.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ email, password })
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.msg);
+      if (data.status === 'ok') {
+        closeModal();
+        checkLoginStatus();
+      }
+    });
+}
 
-    // Simula login automático después del registro
-    sessionStorage.setItem('usuarioLogueado', '1');
-    const destino = sessionStorage.getItem('postLoginRedirect') || 'dashboard.html';
-    sessionStorage.removeItem('postLoginRedirect');
-    window.location.href = destino;
-  } else {
-    alert('Por favor, completa todos los campos.');
-  }
+function checkAuthAndRedirect(url) {
+  fetch('php/check_session.php')
+    .then(res => res.json())
+    .then(data => {
+      if (data.logged_in) {
+        window.location.href = url;
+      } else {
+        openModal(); // Muestra el modal si NO está logeado
+      }
+    })
+    .catch(err => {
+      console.error("Error verificando sesión:", err);
+      openModal(); // Por si acaso, muestra el modal si algo falla
+    });
 }

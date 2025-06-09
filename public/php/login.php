@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once 'config.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -6,22 +7,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = $_POST["password"] ?? '';
 
     if (!$email || !$password) {
-        echo json_encode(["status" => "error", "msg" => "Faltan email o contraseña"]);
+        echo json_encode(["status" => "error", "msg" => "Email y contraseña requeridos"]);
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT u.id, u.nombre, u.password_hash FROM usuarios u WHERE u.email = ?");
+    $stmt = $pdo->prepare("SELECT id, nombre, password_hash FROM usuarios WHERE email = ?");
     $stmt->execute([$email]);
-    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+    $user = $stmt->fetch();
 
-    if ($usuario && password_verify($password, $usuario["password_hash"])) {
-        // Guardar en sesión
-        $_SESSION["usuario_id"] = $usuario["id"];
-        $_SESSION["usuario_nombre"] = $usuario["nombre"];
-
-        echo json_encode(["status" => "ok", "msg" => "Bienvenido, {$usuario['nombre']}"]);
+    if ($user && password_verify($password, $user["password_hash"])) {
+        $_SESSION["usuario_id"] = $user["id"];
+        $_SESSION["nombre"] = $user["nombre"];
+        echo json_encode(["status" => "ok", "msg" => "Bienvenido " . $user["nombre"]]);
     } else {
-        echo json_encode(["status" => "error", "msg" => "Email o contraseña incorrectos"]);
+        echo json_encode(["status" => "error", "msg" => "Credenciales inválidas"]);
     }
 }
 ?>

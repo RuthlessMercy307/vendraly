@@ -19,9 +19,13 @@
         <a href="#" onclick="openModal('dashboard.html')">Invertir</a>
         <a href="#" onclick="openModal('dashboard.html')">Publicar Proyecto</a>
       </nav>
-      <div class="nav-actions nav-links">
+      <div class="nav-actions nav-links" id="authButtons">
         <button class="btn btn-outline" onclick="openModal()">Login</button>
         <button class="btn btn-primary" onclick="openModal()">Registrarse</button>
+      </div>
+      <div class="nav-actions nav-links hidden" id="userPanel">
+        <span id="userName"></span>
+        <button class="btn btn-outline" onclick="logout()">Salir</button>
       </div>
     </div>
   </header>
@@ -30,8 +34,8 @@
     <h1>Invierte en el <span>futuro local</span></h1>
     <p>Conectamos inversores con emprendedores locales. Invierte desde pequeñas cantidades en negocios reales y obtén retornos atractivos mientras apoyas el crecimiento de tu comunidad.</p>
     <div style="margin-top:1.5rem;">
-      <button onclick="openModal('dashboard.html')" class="btn btn-primary">Comenzar a Invertir</button>
-      <button onclick="openModal('dashboard.html')" class="btn btn-outline">Publicar Proyecto</button>
+      <button onclick="checkAuthAndRedirect('dashboard.php')" class="btn btn-primary">Comenzar a Invertir</button>
+      <button onclick="checkAuthAndRedirect('dashboard.php')" class="btn btn-outline">Publicar Proyecto</button>
     </div>
   </section>
 
@@ -122,6 +126,27 @@
 
 
 <script src="js/app.js"></script>
+
+<script>
+function checkLoginStatus() {
+  fetch('php/check_session.php')
+    .then(res => res.json())
+    .then(data => {
+      if (data.logged_in) {
+        document.getElementById('authButtons').classList.add('hidden');
+        document.getElementById('userPanel').classList.remove('hidden');
+        document.getElementById('userName').innerText = `Hola, ${data.nombre}`;
+      }
+    });
+}
+
+function logout() {
+  fetch('php/logout.php')
+    .then(() => location.reload());
+}
+
+checkLoginStatus();
+</script>
 
 </body>
 </html>
