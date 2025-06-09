@@ -1,13 +1,10 @@
 # Vendraly
 
-Plataforma de microinversiones colaborativas.
+Este repositorio contiene un ejemplo simple de la interfaz principal usando solo HTML, CSS y JavaScript. Puede subirse a cualquier hosting estático.
 
-## Backend
+## Archivos
+- `index.html` - página principal con las secciones de proyectos.
+- `css/style.css` - estilos modernos con gradientes y diseño responsivo.
+- `js/app.js` - código JavaScript para la navegación móvil y carga de proyectos.
 
-El backend está hecho con Node.js, Express y SQLite.
-
-### Cómo ejecutar:
-
-```bash
-npm install
-node server.js
+Los datos de los proyectos están en la variable `projects` dentro de `app.js`. En un hosting con PHP, podrías cargar esos datos desde una base de datos MySQL y generar la página usando includes para el `header` y `footer`.
