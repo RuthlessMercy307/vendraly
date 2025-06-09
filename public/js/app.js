@@ -199,16 +199,86 @@ function renderProjects() {
     card.appendChild(buttons);
 
     grid.appendChild(card);
-    
+
     btnDetails.onclick = () => {
-      window.location.href = 'dashboard.html'; // o 'detalle.html?id=' + p.id si luego usas IDs
+      openModal('dashboard.html');
     };
 
     btnInvest.onclick = () => {
-      window.location.href = 'dashboard.html';
+      openModal('dashboard.html');
     };
 
   });
 }
 
 document.addEventListener('DOMContentLoaded', renderProjects);
+
+const usuarioLogueado = sessionStorage.getItem('usuarioLogueado') === '1';
+
+function openModal(destino = null) {
+  if (usuarioLogueado) {
+    if (destino) window.location.href = destino;
+    return;
+  }
+
+  document.getElementById('authModal').classList.remove('hidden');
+
+  // Guarda destino para redirigir después del login
+  if (destino) {
+    sessionStorage.setItem('postLoginRedirect', destino);
+  }
+}
+
+function closeModal() {
+  document.getElementById('authModal').classList.add('hidden');
+}
+
+function handleLogin(event) {
+  event.preventDefault();
+
+  // Aquí iría tu validación real (correo, contraseña...)
+  // Por ahora lo simulamos
+  const email = document.querySelector('.auth-form input[type="email"]').value;
+  const pass = document.querySelector('.auth-form input[type="password"]').value;
+
+  if (email && pass) {
+    // Guardar como "logueado" (ejemplo temporal)
+    sessionStorage.setItem('usuarioLogueado', '1');
+
+    const destino = sessionStorage.getItem('postLoginRedirect') || 'dashboard.html';
+    sessionStorage.removeItem('postLoginRedirect');
+    window.location.href = destino;
+  } else {
+    alert("Completa los campos para continuar");
+  }
+}
+
+function switchToRegister() {
+  document.getElementById('loginForm').classList.add('hidden');
+  document.getElementById('registerForm').classList.remove('hidden');
+}
+
+function switchToLogin() {
+  document.getElementById('registerForm').classList.add('hidden');
+  document.getElementById('loginForm').classList.remove('hidden');
+}
+
+function handleRegister(event) {
+  event.preventDefault();
+  const form = event.target;
+  const name = form.querySelector('input[type="text"]').value;
+  const email = form.querySelector('input[type="email"]').value;
+  const password = form.querySelector('input[type="password"]').value;
+
+  if (name && email && password) {
+    alert(`¡Bienvenido ${name}! (registro simulado)`);
+
+    // Simula login automático después del registro
+    sessionStorage.setItem('usuarioLogueado', '1');
+    const destino = sessionStorage.getItem('postLoginRedirect') || 'dashboard.html';
+    sessionStorage.removeItem('postLoginRedirect');
+    window.location.href = destino;
+  } else {
+    alert('Por favor, completa todos los campos.');
+  }
+}
