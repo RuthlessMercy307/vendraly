@@ -1,12 +1,10 @@
 <?php
-session_start();
+require 'config.php';
 
 if (!isset($_SESSION['usuario_id'])) {
   echo json_encode(['status' => 'error', 'msg' => 'No has iniciado sesión.']);
   exit;
 }
-
-require 'config.php';
 
 $usuario_id = $_SESSION['usuario_id'];
 $nombre_usuario = $_SESSION['nombre'] ?? 'Usuario';
