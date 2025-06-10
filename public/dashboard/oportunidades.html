@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendraly</title>
+  <link rel="stylesheet" href="../css/oportunidades.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/card.css">
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="logo">Vendraly</div>
+            <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
+            <nav class="nav-links">
+            <a href="oportunidades.html">Oportunidades</a>
+            <a href="crearproyecto.html">Crear Proyecto</a>
+            <a href="mensajes.html">Mensajes</a>
+            <a href="portafolio.html">Portafolio</a>
+            <a href="cuenta.html">Cuenta</a>
+            </nav>
+            <div class="nav-actions nav-links hidden" id="userPanel">
+            <span id="userName"></span>
+            <button class="btn btn-outline" onclick="logout()">Salir</button>
+            </div>
+        </div>
+    </header>
+
+  <section class="projects">
+    <div style="text-align:center;margin-bottom:2rem;">
+      <h2>Proyectos Disponibles</h2>
+      <p>Descubre oportunidades de inversión en negocios locales con retornos atractivos</p>
+    </div>
+    <div id="project-grid" class="project-grid"></div>
+    <div style="text-align:center;margin-top:2rem;">
+      <button onclick="openModal('dashboard.html')" class="btn btn-outline">Ver Todos los Proyectos</button>
+    </div>
+  </section>
+
+
+  <footer>
+    <div style="max-width:1200px;margin:0 auto;">
+      <p>&copy; 2024 Vendraly. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+<script src="../js/oportunidades.js"></script>
+<script>
+function checkLoginStatus() {
+  // 👇 Ignora la verificación y deja pasar
+  document.getElementById('userPanel').classList.remove('hidden');
+  document.getElementById('userName').innerText = `Hola, Dev Tester 😎`;
+}
+
+
+function logout() {
+  fetch('../php/logout.php')
+    .then(() => window.location.href = "../index.html");
+}
+
+checkLoginStatus();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mensajes – Vendraly</title>
+  <link rel="stylesheet" href="../css/mensajes.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="navbar">
+      <div class="logo">Vendraly</div>
+      <nav class="nav-links">
+        <a href="oportunidades.html">Oportunidades</a>
+        <a href="crearproyecto.html">Crear Proyecto</a>
+        <a href="mensajes.html">Mensajes</a>
+        <a href="portafolio.html">Portafolio</a>
+        <a href="cuenta.html">Cuenta</a>
+      </nav>
+      <div class="nav-actions nav-links hidden" id="userPanel">
+        <span id="userName"></span>
+        <button class="btn btn-outline" onclick="logout()">Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="chat-container">
+    <section class="messages">
+    <!-- Lado izquierdo: Lista de chats -->
+    <div class="chat-list">
+        <input type="text" placeholder="Buscar...">
+        <ul>
+        <li>
+            <strong>Soporte Vendraly</strong><br>
+            <small>¿En qué podemos ayudarte hoy?</small>
+        </li>
+        <!-- Más chats podrían ir aquí -->
+        </ul>
+    </div>
+
+    <!-- Centro: Ventana de conversación -->
+    <div class="chat-window">
+        <h3>Soporte Vendraly</h3>
+        <div class="chat-messages">
+        <div class="fecha-chat">11 jun. 2025</div>
+
+        <div class="mensaje otro">
+            <div class="burbuja">
+            ¡Hola! ¿Cómo podemos ayudarte?
+            </div>
+        </div>
+
+        <div class="mensaje yo">
+            <div class="burbuja">
+            Estoy configurando mi cuenta 😄
+            </div>
+        </div>
+
+        <div class="fecha-chat">12 jun. 2025</div>
+
+        <div class="mensaje yo">
+            <div class="burbuja">
+            Me gustaría cambiar el teléfono registrado
+            </div>
+        </div>
+        </div>
+
+        <form>
+        <input type="text" placeholder="Escribe un mensaje..." />
+        <button class="btn btn-primary" type="submit">Enviar</button>
+        </form>
+    </div>
+
+    <!-- Derecha: Información del chat -->
+    <div class="chat-sidebar">
+        <h4>Información del Chat</h4>
+        <p><strong>Participantes:</strong></p>
+        <ul>
+        <li>Dev Tester (Tú)</li>
+        <li>Admin Vendraly</li>
+        </ul>
+        <p><strong>Propietario del Proyecto:</strong> Carlos Ruiz</p>
+    </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div style="max-width:1200px;margin:0 auto;text-align:center;">
+      <p>&copy; 2024 Vendraly. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="../js/mensajes.js"></script>
+</body>
+</html>

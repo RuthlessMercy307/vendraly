@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear Proyecto – Vendraly</title>
+  <link rel="stylesheet" href="../css/portafolio.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+  <div class="navbar">
+    <div class="logo">Vendraly</div>
+    <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
+    <nav class="nav-links">
+      <a href="oportunidades.html">Oportunidades</a>
+      <a href="crearproyecto.html">Crear Proyecto</a>
+      <a href="mensajes.html">Mensajes</a>
+      <a href="portafolio.html">Portafolio</a>
+      <a href="cuenta.html">Cuenta</a>
+    </nav>
+    <div class="nav-actions nav-links hidden" id="userPanel">
+      <span id="userName"></span>
+      <button class="btn btn-outline" onclick="logout()">Salir</button>
+    </div>
+  </div>
+</header>
+
+<section class="projects">
+    <div class="form-header">
+      <h2>Resumen de tu Portafolio</h2>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <h3>R$ <span id="stakeTotal">0.00</span></h3>
+        <p>Monto en Stake</p>
+      </div>
+      <div class="stat">
+        <h3>R$ <span id="inversionTotal">0.00</span></h3>
+        <p>Monto Invertido</p>
+      </div>
+      <div class="stat">
+        <h3>R$ <span id="prestadoTotal">0.00</span></h3>
+        <p>Total Prestado a Terceros</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 4rem;">
+      <h2>Mis Proyectos Publicados</h2>
+      <p>Aquí puedes ver tus proyectos de préstamo o acciones.</p>
+      <div id="misProyectos" class="project-grid"></div>
+    </div>
+
+    <div style="margin-top: 4rem;">
+      <h2>Mis Inversiones</h2>
+      <p>Tus inversiones activas y completadas.</p>
+      <div id="misInversiones" class="project-grid"></div>
+    </div>
+
+    <div class="stake-history">
+        <h2>Historial de Stakes</h2>
+        <p>Revisa tus aportes bloqueados, intereses acumulados y fechas de liberación.</p>
+        <table>
+            <thead>
+            <tr>
+                <th>Fecha de Inicio</th>
+                <th>Monto (R$)</th>
+                <th>Interés Acumulado</th>
+                <th>Bloqueado Hasta</th>
+                <th>Estado</th>
+            </tr>
+            </thead>
+            <tbody id="tablaStakes">
+            <tr>
+                <td colspan="5" style="color: #94a3b8;">Aún no has realizado stakes.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+  </section>
+
+<footer>
+  <div style="max-width:1200px;margin:0 auto;text-align:center;">
+    <p>&copy; 2024 Vendraly. Todos los derechos reservados.</p>
+  </div>
+</footer>
+<script src="../js/portafolio.js"></script>
+</body>
+</html>

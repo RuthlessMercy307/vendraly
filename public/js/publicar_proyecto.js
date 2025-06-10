@@ -1,0 +1,56 @@
+function toggleMenu() {
+  const links = document.querySelector('.nav-links');
+  links.classList.toggle('open');
+}
+
+function checkLoginStatus() {
+  document.getElementById('userPanel').classList.remove('hidden');
+  document.getElementById('userName').innerText = `Hola, Dev Tester 😎`;
+}
+
+function logout() {
+  fetch('../php/logout.php')
+    .then(() => window.location.href = "../index.html");
+}
+
+checkLoginStatus();
+
+const tipoSelect = document.getElementById('tipoProyecto');
+
+const grupoPrestamo = document.getElementById('grupoPrestamo');
+const grupoPlazo = document.getElementById('grupoPlazo');
+const grupoRetorno = document.getElementById('grupoRetorno');
+const grupoAcciones = document.getElementById('grupoAcciones');
+
+function actualizarFormularioPorTipo() {
+  const tipo = tipoSelect.value;
+
+  const esPrestamo = tipo === 'prestamo';
+
+  grupoPrestamo.classList.toggle('hidden', !esPrestamo);
+  grupoPlazo.classList.toggle('hidden', !esPrestamo);
+  grupoRetorno.classList.toggle('hidden', !esPrestamo);
+  grupoAcciones.classList.toggle('hidden', esPrestamo);
+}
+
+tipoSelect.addEventListener('change', actualizarFormularioPorTipo);
+actualizarFormularioPorTipo(); // Ejecutar al cargar
+
+
+// Envío del formulario
+function submitProject(e) {
+  e.preventDefault();
+  const form = new FormData(e.target);
+
+  fetch('../php/publicar_proyecto.php', {
+    method: 'POST',
+    body: form
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.msg);
+    if (data.status === 'ok') {
+      window.location.href = "portafolio.html";
+    }
+  });
+}
