@@ -162,11 +162,16 @@ function renderProjects() {
 
     const owner = document.createElement('div');
     owner.className = 'owner';
-    owner.innerHTML = `
-      <span>👤</span>
-      <span>Por:</span>
-      <span class="owner-name">${p.owner}</span>
-    `;
+    const ownerIcon = document.createElement('span');
+    ownerIcon.textContent = '👤';
+    const ownerLabel = document.createElement('span');
+    ownerLabel.textContent = 'Por:';
+    const ownerName = document.createElement('span');
+    ownerName.className = 'owner-name';
+    ownerName.textContent = p.owner;
+    owner.appendChild(ownerIcon);
+    owner.appendChild(ownerLabel);
+    owner.appendChild(ownerName);
 
     const buttons = document.createElement('div');
     buttons.className = 'buttons';
