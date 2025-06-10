@@ -1,14 +1,14 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['id'])) {
+if (!isset($_SESSION['usuario_id'])) {
   echo json_encode(['status' => 'error', 'msg' => 'No has iniciado sesión.']);
   exit;
 }
 
 require 'config.php';
 
-$usuario_id = $_SESSION['id'];
+$usuario_id = $_SESSION['usuario_id'];
 $nombre_usuario = $_SESSION['nombre'] ?? 'Usuario';
 
 $tipo = $_POST['tipo'] ?? '';
