@@ -201,11 +201,11 @@ function renderProjects() {
     grid.appendChild(card);
 
     btnDetails.onclick = () => {
-      openModal('dashboard.html');
+      openModal('dashboard/oportunidades.html');
     };
 
     btnInvest.onclick = () => {
-      openModal('dashboard.html');
+      openModal('dashboard/oportunidades.html');
     };
 
   });

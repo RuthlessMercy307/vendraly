@@ -3,9 +3,14 @@ function toggleMenu() {
   links.classList.toggle('open');
 }
 
-function checkLoginStatus() {
-  document.getElementById('userPanel').classList.remove('hidden');
-  document.getElementById('userName').innerText = `Hola, Dev Tester 😎`;
+async function checkLoginStatus() {
+  const data = await fetchUserSession();
+  if (data.logged_in) {
+    document.getElementById('userPanel').classList.remove('hidden');
+    document.getElementById('userName').innerText = `Hola, ${data.nombre}`;
+  } else {
+    window.location.href = "../index.html";
+  }
 }
 
 function logout() {

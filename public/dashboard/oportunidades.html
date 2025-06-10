@@ -34,7 +34,7 @@
     </div>
     <div id="project-grid" class="project-grid"></div>
     <div style="text-align:center;margin-top:2rem;">
-      <button onclick="openModal('dashboard.html')" class="btn btn-outline">Ver Todos los Proyectos</button>
+      <button onclick="openModal('dashboard/oportunidades.html')" class="btn btn-outline">Ver Todos los Proyectos</button>
     </div>
   </section>
 
@@ -45,22 +45,8 @@
     </div>
   </footer>
 
+<script src="../js/session.js"></script>
 <script src="../js/oportunidades.js"></script>
-<script>
-function checkLoginStatus() {
-  // 👇 Ignora la verificación y deja pasar
-  document.getElementById('userPanel').classList.remove('hidden');
-  document.getElementById('userName').innerText = `Hola, Dev Tester 😎`;
-}
-
-
-function logout() {
-  fetch('../php/logout.php')
-    .then(() => window.location.href = "../index.html");
-}
-
-checkLoginStatus();
-</script>
 
 </body>
 </html>
