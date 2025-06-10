@@ -211,7 +211,17 @@ function renderProjects() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', renderProjects);
+let csrfToken = '';
+function loadCsrfToken() {
+  fetch('php/csrf_token.php')
+    .then(res => res.json())
+    .then(data => { csrfToken = data.token; });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadCsrfToken();
+  renderProjects();
+});
 
 const usuarioLogueado = sessionStorage.getItem('usuarioLogueado') === '1';
 
@@ -253,7 +263,7 @@ function handleRegister(e) {
   fetch('php/register.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ nombre, email, telefono: '000000000', password })
+    body: new URLSearchParams({ nombre, email, telefono: '000000000', password, csrf_token: csrfToken })
   })
     .then(res => res.json())
     .then(data => {
@@ -274,7 +284,7 @@ function handleLogin(e) {
   fetch('php/login.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ email, password })
+    body: new URLSearchParams({ email, password, csrf_token: csrfToken })
   })
     .then(res => res.json())
     .then(data => {
