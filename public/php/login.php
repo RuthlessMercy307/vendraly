@@ -28,7 +28,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($user && password_verify($password, $user["password_hash"])) {
         $_SESSION["usuario_id"] = $user["id"];
         $_SESSION["nombre"] = $user["nombre"];
-        echo json_encode(["status" => "ok", "msg" => "Bienvenido " . $user["nombre"]]);
+        $nombre = htmlspecialchars($user["nombre"], ENT_QUOTES, 'UTF-8');
+        echo json_encode(["status" => "ok", "msg" => "Bienvenido " . $nombre]);
     } else {
         echo json_encode(["status" => "error", "msg" => "Credenciales inválidas"]);
     }
