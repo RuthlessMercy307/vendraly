@@ -1,9 +1,13 @@
 <?php
 // config.php
-$host = 'localhost';
-$dbname = 'cambblym_vendraly';
-$user = 'cambblym_vendraly';
-$pass = '2j)I]V4G^1dV';
+$host = getenv('DB_HOST') ?: 'localhost';
+$dbname = getenv('DB_NAME') ?: 'cambblym_vendraly';
+$user = getenv('DB_USER') ?: 'cambblym_vendraly';
+$pass = getenv('DB_PASS') ?: '2j)I]V4G^1dV';
+
+if (!$user || !$pass) {
+    die('Database credentials not provided. Set DB_USER and DB_PASS environment variables.');
+}
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass);
