@@ -33,8 +33,22 @@ if ($tipo === 'prestamo') {
   }
 
   $estado = 'cerrado';
-  $stmt = $conn->prepare("INSERT INTO proyectos_prestamo (usuario_id, titulo, descripcion_corta, descripcion_larga, necesario, plazo, retorno, nombre_usuario, categoria, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-  $stmt->bind_param("issssidsss", $usuario_id, $titulo, $descripcion_corta, $descripcion_larga, $monto, $plazo, $retorno, $nombre_usuario, $categoria, $estado);
+  $stmt = $pdo->prepare(
+    "INSERT INTO proyectos_prestamo (usuario_id, titulo, descripcion_corta, descripcion_larga, necesario, plazo, retorno, nombre_usuario, categoria, estado)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  );
+  $success = $stmt->execute([
+    $usuario_id,
+    $titulo,
+    $descripcion_corta,
+    $descripcion_larga,
+    $monto,
+    $plazo,
+    $retorno,
+    $nombre_usuario,
+    $categoria,
+    $estado
+  ]);
 
 } elseif ($tipo === 'acciones') {
   $porcentaje_disponible = floatval($_POST['porcentaje_disponible'] ?? 0);
@@ -46,19 +60,30 @@ if ($tipo === 'prestamo') {
   }
 
   $estado = 'cerrado';
-  $stmt = $conn->prepare("INSERT INTO proyectos_acciones (usuario_id, titulo, descripcion_corta, descripcion_larga, porcentaje_disponible, precio_porcentaje, nombre_usuario, categoria, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-  $stmt->bind_param("isssddsss", $usuario_id, $titulo, $descripcion_corta, $descripcion_larga, $porcentaje_disponible, $precio_porcentaje, $nombre_usuario, $categoria, $estado);
+  $stmt = $pdo->prepare(
+    "INSERT INTO proyectos_acciones (usuario_id, titulo, descripcion_corta, descripcion_larga, porcentaje_disponible, precio_porcentaje, nombre_usuario, categoria, estado)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  );
+  $success = $stmt->execute([
+    $usuario_id,
+    $titulo,
+    $descripcion_corta,
+    $descripcion_larga,
+    $porcentaje_disponible,
+    $precio_porcentaje,
+    $nombre_usuario,
+    $categoria,
+    $estado
+  ]);
 
 } else {
   echo json_encode(['status' => 'error', 'msg' => 'Tipo de proyecto no válido.']);
   exit;
 }
 
-if ($stmt->execute()) {
+if ($success) {
   echo json_encode(['status' => 'ok', 'msg' => 'Proyecto enviado para revisión.']);
 } else {
   echo json_encode(['status' => 'error', 'msg' => 'Error al publicar el proyecto.']);
 }
 
-$stmt->close();
-$conn->close();
