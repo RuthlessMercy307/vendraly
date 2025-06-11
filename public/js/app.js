@@ -294,7 +294,7 @@ function handleLogin(e) {
 }
 
 function checkAuthAndRedirect(url) {
-  fetch('php/check_session.php')
+  fetch('php/verificar_sesion.php')
     .then(res => res.json())
     .then(data => {
       if (data.logged_in) {

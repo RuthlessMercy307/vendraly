@@ -47,7 +47,7 @@ function submitProject(e) {
   e.preventDefault();
   const form = new FormData(e.target);
 
-  fetch('../php/publicar_proyecto.php', {
+  fetch('../php/crear_proyecto.php', {
     method: 'POST',
     body: form
   })
