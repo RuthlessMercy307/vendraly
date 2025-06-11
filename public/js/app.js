@@ -259,7 +259,7 @@ function handleRegister(e) {
 
   fetch('php/register.php', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': csrfToken },
     body: new URLSearchParams({ nombre, email, telefono: '000000000', password })
   })
     .then(res => res.json())
@@ -280,7 +280,7 @@ function handleLogin(e) {
 
   fetch('php/login.php', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': csrfToken },
     body: new URLSearchParams({ email, password })
   })
     .then(res => res.json())

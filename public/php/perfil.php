@@ -1,5 +1,6 @@
 <?php
 require 'config.php';
+require 'csrf_token.php';
 
 if (!isset($_SESSION['usuario_id'])) {
     echo json_encode(['status' => 'error', 'msg' => 'No has iniciado sesión.']);
@@ -15,6 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     echo json_encode(['status' => 'ok', 'perfil' => $perfil]);
     exit;
 }
+
+verify_csrf_token();
 
 // Actualización simple
 $bio = $_POST['bio'] ?? null;
