@@ -29,14 +29,23 @@ const grupoAcciones = document.getElementById('grupoAcciones');
 
 function actualizarFormularioPorTipo() {
   const tipo = tipoSelect.value;
-
   const esPrestamo = tipo === 'prestamo';
 
+  // Mostrar/ocultar grupos visualmente
   grupoPrestamo.classList.toggle('hidden', !esPrestamo);
   grupoPlazo.classList.toggle('hidden', !esPrestamo);
   grupoRetorno.classList.toggle('hidden', !esPrestamo);
   grupoAcciones.classList.toggle('hidden', esPrestamo);
+
+  // Activar/desactivar required dinámicamente
+  document.querySelector('input[name="monto"]').required = esPrestamo;
+  document.querySelector('input[name="plazo"]').required = esPrestamo;
+  document.querySelector('input[name="retorno"]').required = esPrestamo;
+
+  document.querySelector('input[name="porcentaje_disponible"]').required = !esPrestamo;
+  document.querySelector('input[name="precio_porcentaje"]').required = !esPrestamo;
 }
+
 
 tipoSelect.addEventListener('change', actualizarFormularioPorTipo);
 actualizarFormularioPorTipo(); // Ejecutar al cargar

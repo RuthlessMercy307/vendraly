@@ -38,6 +38,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt = $pdo->prepare("INSERT INTO perfil_usuario (usuario_id, bio, direccion, estado, saldo, documento_numero, foto_documento, foto_selfie, foto_de_lado) VALUES (?, NULL, NULL, 'en_verificacion', 0.00, NULL, NULL, NULL, NULL)");
     $stmt->execute([$usuario_id]);
 
+    include 'crear_chat_soporte.php';
+
     echo json_encode(["status" => "ok", "msg" => "Registrado con éxito"]);
 }
+
 ?>

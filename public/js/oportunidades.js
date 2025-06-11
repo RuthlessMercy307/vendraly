@@ -1,86 +1,16 @@
-const projects = [
-  {
-    id: 1,
-    title: "Cafetería Artesanal Downtown",
-    description: "Expansión de cafetería local con nuevos equipos y renovación del local para aumentar capacidad.",
-    amountNeeded: 25000,
-    amountRaised: 18500,
-    returnRate: 12,
-    timeEstimate: "50 meses",
-    owner: "María González",
-    status: "disponible",
-    category: "Gastronomía"
-  },
-  {
-    id: 2,
-    title: "Tienda Online de Productos Eco",
-    description: "Startup de productos ecológicos necesita capital para inventario inicial y marketing digital.",
-    amountNeeded: 15000,
-    amountRaised: 15000,
-    returnRate: 15,
-    timeEstimate: "12 meses",
-    owner: "Carlos Ruiz",
-    status: "completado",
-    category: "E-commerce"
-  },
-  {
-    id: 3,
-    title: "Taller de Reparación de Bicicletas",
-    description: "Negocio familiar busca financiamiento para herramientas especializadas y ampliación del taller.",
-    amountNeeded: 8000,
-    amountRaised: 3200,
-    returnRate: 10,
-    timeEstimate: "24 meses",
-    owner: "Ana Martínez",
-    status: "disponible",
-    category: "Servicios"
-  },
-  {
-    id: 4,
-    title: "App de Delivery Local",
-    description: "Aplicación móvil para conectar restaurantes locales con clientes, necesita desarrollo y marketing.",
-    amountNeeded: 35000,
-    amountRaised: 12000,
-    returnRate: 18,
-    timeEstimate: "15 meses",
-    owner: "Tech Solutions SRL",
-    status: "disponible",
-    category: "Tecnología"
-  },
-  {
-    id: 5,
-    title: "Panadería Artesanal",
-    description: "Panadería tradicional busca modernizar equipos y abrir segunda sucursal en zona comercial.",
-    amountNeeded: 20000,
-    amountRaised: 20000,
-    returnRate: 11,
-    timeEstimate: "20 meses",
-    owner: "Familia Rodríguez",
-    status: "completado",
-    category: "Gastronomía"
-  },
-  {
-    id: 6,
-    title: "Centro de Yoga y Bienestar",
-    description: "Estudio de yoga necesita equipamiento y acondicionamiento para ofrecer más clases y servicios.",
-    amountNeeded: 12000,
-    amountRaised: 7800,
-    returnRate: 13,
-    timeEstimate: "16 meses",
-    owner: "Lucía Fernández",
-    status: "disponible",
-    category: "Bienestar"
-  }
-];
-
-function toggleMenu() {
-  const links = document.querySelector('.nav-links');
-  links.classList.toggle('open');
-}
-
-function renderProjects() {
+async function renderProjects() {
   const grid = document.getElementById('project-grid');
   if (!grid) return;
+
+  const res = await fetch('../php/ver_proyectos_activos.php');
+  const data = await res.json();
+
+  if (data.status !== 'ok') {
+    grid.innerHTML = '<p>No se pudieron cargar los proyectos.</p>';
+    return;
+  }
+
+  const projects = data.proyectos;
 
   projects.forEach(p => {
     const card = document.createElement('div');
@@ -91,44 +21,56 @@ function renderProjects() {
 
     const category = document.createElement('div');
     category.className = 'category';
-    category.textContent = p.category;
+    category.textContent = p.categoria;
 
     const status = document.createElement('div');
     status.className = 'status';
-    status.textContent = p.status === 'disponible' ? 'Disponible' : 'Completado';
-    if (p.status === 'completado') {
-      status.style.background = '#dbeafe';
-      status.style.color = '#1e40af';
-      status.style.borderColor = '#bfdbfe';
-    }
+    status.textContent = 'Disponible';
 
     header.appendChild(category);
     header.appendChild(status);
 
     const title = document.createElement('div');
     title.className = 'title';
-    title.textContent = p.title;
+    title.textContent = p.titulo;
 
     const desc = document.createElement('div');
     desc.className = 'description';
-    desc.textContent = p.description;
+    desc.textContent = p.descripcion_corta;
 
     const progressSection = document.createElement('div');
     progressSection.className = 'progress-section';
 
-    const progressLabel = document.createElement('div');
-    progressLabel.className = 'progress-label';
-    progressLabel.innerHTML = `
-      <span>Progreso</span>
-      <span>$${p.amountRaised.toLocaleString()} / $${p.amountNeeded.toLocaleString()}</span>
-    `;
+   const progressLabel = document.createElement('div');
+progressLabel.className = 'progress-label';
+
+let progreso = 0;
+let progresoTexto = '';
+
+if (p.tipo === 'prestamo') {
+  const acumulado = parseFloat(p.acumulado ?? 0);
+  const necesario = parseFloat(p.necesario ?? 1);
+  progreso = Math.min((acumulado / necesario) * 100, 100);
+  progresoTexto = `R$${acumulado.toLocaleString()} / R$${necesario.toLocaleString()}`;
+} else if (p.tipo === 'acciones') {
+  const porcentajeTotal = parseFloat(p.porcentaje_disponible ?? 0);
+  const porcentajeVendido = parseFloat(p.porcentaje_vendido ?? 0);
+  progreso = Math.min((porcentajeVendido / (porcentajeTotal || 1)) * 100, 100);
+  progresoTexto = `${porcentajeVendido.toFixed(2)}% / ${porcentajeTotal.toFixed(2)}%`;
+}
+
+progressLabel.innerHTML = `
+  <span>Progreso</span>
+  <span>${progresoTexto}</span>
+`;
+
 
     const progressBar = document.createElement('div');
     progressBar.className = 'progress-bar';
 
     const progressFill = document.createElement('div');
     progressFill.className = 'progress-fill';
-    progressFill.style.width = Math.min((p.amountRaised / p.amountNeeded) * 100, 100) + '%';
+    progressFill.style.width = progreso + '%';
 
     progressBar.appendChild(progressFill);
     progressSection.appendChild(progressLabel);
@@ -137,28 +79,53 @@ function renderProjects() {
     const details = document.createElement('div');
     details.className = 'details';
 
-    const retorno = document.createElement('div');
-    retorno.className = 'detail-item';
-    retorno.innerHTML = `
-      <div class="icon green-text">↑</div>
-      <div class="detail-content">
-        <div class="detail-label">Retorno</div>
-        <div class="detail-value green-text">${p.returnRate}%</div>
-      </div>
-    `;
+    if (p.tipo === 'prestamo') {
+      const retorno = document.createElement('div');
+      retorno.className = 'detail-item';
+      retorno.innerHTML = `
+        <div class="icon green-text">↑</div>
+        <div class="detail-content">
+          <div class="detail-label">Retorno</div>
+          <div class="detail-value green-text">${p.retorno ?? '-'}%</div>
+        </div>
+      `;
 
-    const plazo = document.createElement('div');
-    plazo.className = 'detail-item';
-    plazo.innerHTML = `
-      <div class="icon blue-text">⏱</div>
-      <div class="detail-content">
-        <div class="detail-label">Plazo</div>
-        <div class="detail-value">${p.timeEstimate}</div>
-      </div>
-    `;
+      const plazo = document.createElement('div');
+      plazo.className = 'detail-item';
+      plazo.innerHTML = `
+        <div class="icon blue-text">⏱</div>
+        <div class="detail-content">
+          <div class="detail-label">Plazo</div>
+          <div class="detail-value">${p.plazo ?? '-'} meses</div>
+        </div>
+      `;
 
-    details.appendChild(retorno);
-    details.appendChild(plazo);
+      details.appendChild(retorno);
+      details.appendChild(plazo);
+    } else if (p.tipo === 'acciones') {
+      const porcentaje = document.createElement('div');
+      porcentaje.className = 'detail-item';
+      porcentaje.innerHTML = `
+        <div class="icon yellow-text">📊</div>
+        <div class="detail-content">
+          <div class="detail-label">Disponible</div>
+          <div class="detail-value">${p.porcentaje_disponible ?? 0}%</div>
+        </div>
+      `;
+
+      const precio = document.createElement('div');
+      precio.className = 'detail-item';
+      precio.innerHTML = `
+        <div class="icon purple-text">💰</div>
+        <div class="detail-content">
+          <div class="detail-label">Precio (0.01%)</div>
+          <div class="detail-value">R$${parseFloat(p.precio_porcentaje ?? 0).toLocaleString()}</div>
+        </div>
+      `;
+
+      details.appendChild(porcentaje);
+      details.appendChild(precio);
+    }
 
     const owner = document.createElement('div');
     owner.className = 'owner';
@@ -183,16 +150,14 @@ function renderProjects() {
       window.location.href = `verproyecto.html?id=${p.id}`;
     };
 
-    if (p.status === 'disponible') {
-      const btnInvest = document.createElement('button');
-      btnInvest.className = 'btn btn-primary';
-      btnInvest.textContent = '$ Invertir';
-      btnInvest.onclick = () => {
-        window.location.href = `invertir.html?id=${p.id}`;
-      };
-      buttons.appendChild(btnInvest);
-    }
+    const btnInvest = document.createElement('button');
+    btnInvest.className = 'btn btn-primary';
+    btnInvest.textContent = '$ Invertir';
+    btnInvest.onclick = () => {
+      window.location.href = `invertir.html?id=${p.id}`;
+    };
 
+    buttons.appendChild(btnInvest);
     buttons.appendChild(btnDetails);
 
     card.appendChild(header);
@@ -207,7 +172,16 @@ function renderProjects() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', renderProjects);
+
+function logout() {
+  fetch('../php/logout.php')
+    .then(() => window.location.href = "../index.html");
+}
+
+function toggleMenu() {
+  const links = document.querySelector('.nav-links');
+  links.classList.toggle('open');
+}
 
 async function checkLoginStatus() {
   const data = await fetchUserSession();
@@ -219,9 +193,8 @@ async function checkLoginStatus() {
   }
 }
 
-function logout() {
-  fetch('../php/logout.php')
-    .then(() => window.location.href = "../index.html");
-}
+document.addEventListener('DOMContentLoaded', () => {
+  checkLoginStatus();
+  renderProjects();
+});
 
-checkLoginStatus();
