@@ -2,11 +2,6 @@
 require_once 'config.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $csrf = $_POST['csrf_token'] ?? '';
-    if (!hash_equals($_SESSION['csrf_token'] ?? '', $csrf)) {
-        echo json_encode(["status" => "error", "msg" => "Token CSRF inválido"]);
-        exit;
-    }
 
     $email = $_POST["email"] ?? '';
     $password = $_POST["password"] ?? '';

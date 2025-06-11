@@ -216,15 +216,7 @@ function renderProjects() {
   });
 }
 
-let csrfToken = '';
-function loadCsrfToken() {
-  fetch('php/csrf_token.php')
-    .then(res => res.json())
-    .then(data => { csrfToken = data.token; });
-}
-
 document.addEventListener('DOMContentLoaded', () => {
-  loadCsrfToken();
   renderProjects();
 });
 
@@ -268,7 +260,7 @@ function handleRegister(e) {
   fetch('php/register.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ nombre, email, telefono: '000000000', password, csrf_token: csrfToken })
+    body: new URLSearchParams({ nombre, email, telefono: '000000000', password })
   })
     .then(res => res.json())
     .then(data => {
@@ -289,7 +281,7 @@ function handleLogin(e) {
   fetch('php/login.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ email, password, csrf_token: csrfToken })
+    body: new URLSearchParams({ email, password })
   })
     .then(res => res.json())
     .then(data => {
