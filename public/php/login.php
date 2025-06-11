@@ -1,7 +1,9 @@
 <?php
 require_once 'config.php';
+require_once 'csrf_token.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    verify_csrf_token();
 
     $email = $_POST["email"] ?? '';
     $password = $_POST["password"] ?? '';

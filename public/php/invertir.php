@@ -1,10 +1,13 @@
 <?php
 require 'config.php';
+require 'csrf_token.php';
 
 if (!isset($_SESSION['usuario_id'])) {
     echo json_encode(['status' => 'error', 'msg' => 'No has iniciado sesión.']);
     exit;
 }
+
+verify_csrf_token();
 
 $usuario_id = $_SESSION['usuario_id'];
 $proyecto_id = intval($_POST['proyecto_id'] ?? 0);
