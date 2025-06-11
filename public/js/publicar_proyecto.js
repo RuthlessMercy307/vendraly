@@ -46,9 +46,11 @@ actualizarFormularioPorTipo(); // Ejecutar al cargar
 function submitProject(e) {
   e.preventDefault();
   const form = new FormData(e.target);
+  form.append('csrf_token', csrfToken);
 
-  fetch('../php/publicar_proyecto.php', {
+  fetch('../php/crear_proyecto.php', {
     method: 'POST',
+    headers: { 'X-CSRF-Token': csrfToken },
     body: form
   })
   .then(res => res.json())

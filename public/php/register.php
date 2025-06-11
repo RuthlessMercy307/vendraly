@@ -1,7 +1,9 @@
 <?php
 require_once 'config.php';
+require_once 'csrf_token.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    verify_csrf_token();
 
     $nombre = $_POST["nombre"] ?? '';
     $email = $_POST["email"] ?? '';
@@ -28,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Insertar nuevo usuario
     $hash = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare("INSERT INTO usuarios (nombre, email, password_hash, telefono, fecha_registro) VALUES (?, ?, ?, ?, NOW())");
+    $stmt = $pdo->prepare("INSERT INTO usuarios (nombre, email, password_hash, telefono, rol, fecha_registro) VALUES (?, ?, ?, ?, 'usuario', NOW())");
     $stmt->execute([$nombre, $email, $hash, $telefono]);
     $usuario_id = $pdo->lastInsertId();
 

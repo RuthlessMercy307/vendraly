@@ -125,11 +125,12 @@
 </div>
 
 
+<script src="js/csrf.js"></script>
 <script src="js/app.js"></script>
 
 <script>
 function checkLoginStatus() {
-  fetch('php/check_session.php')
+  fetch('php/verificar_sesion.php')
     .then(res => res.json())
     .then(data => {
       if (data.logged_in) {
