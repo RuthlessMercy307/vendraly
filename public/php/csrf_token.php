@@ -22,6 +22,7 @@ function verify_csrf_token($token = null) {
     }
 }
 
+// Si este archivo se accede directamente, devolver el token en JSON
 if (basename(__FILE__) === basename($_SERVER['SCRIPT_FILENAME'])) {
     header('Content-Type: application/json');
     echo json_encode(['token' => csrf_token()]);
