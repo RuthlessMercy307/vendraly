@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+<head> 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mensajes – Vendraly</title>
@@ -27,63 +27,30 @@
 
   <main class="chat-container">
     <section class="messages">
-    <!-- Lado izquierdo: Lista de chats -->
-    <div class="chat-list">
+      <!-- Lista de chats -->
+      <div class="chat-list">
         <input type="text" placeholder="Buscar...">
-        <ul>
-        <li>
-            <strong>Soporte Vendraly</strong><br>
-            <small>¿En qué podemos ayudarte hoy?</small>
-        </li>
-        <!-- Más chats podrían ir aquí -->
-        </ul>
-    </div>
+        <ul id="listaChats"></ul>
+      </div>
 
-    <!-- Centro: Ventana de conversación -->
-    <div class="chat-window">
-        <h3>Soporte Vendraly</h3>
-        <div class="chat-messages">
-        <div class="fecha-chat">11 jun. 2025</div>
-
-        <div class="mensaje otro">
-            <div class="burbuja">
-            ¡Hola! ¿Cómo podemos ayudarte?
-            </div>
-        </div>
-
-        <div class="mensaje yo">
-            <div class="burbuja">
-            Estoy configurando mi cuenta 😄
-            </div>
-        </div>
-
-        <div class="fecha-chat">12 jun. 2025</div>
-
-        <div class="mensaje yo">
-            <div class="burbuja">
-            Me gustaría cambiar el teléfono registrado
-            </div>
-        </div>
-        </div>
-
-        <form id="mensajeForm" data-conversacion-id="1">
-        <input type="text" placeholder="Escribe un mensaje..." />
-        <button class="btn btn-primary" type="submit">Enviar</button>
+      <!-- Ventana de conversación -->
+      <div class="chat-window">
+        <h3 id="nombreChat">Cargando...</h3>
+        <div class="chat-messages" id="contenedorMensajes"></div>
+        <form id="mensajeForm" data-conversacion-id="">
+          <input type="text" placeholder="Escribe un mensaje..." required />
+          <button class="btn btn-primary" type="submit">Enviar</button>
         </form>
-    </div>
+      </div>
 
-    <!-- Derecha: Información del chat -->
-    <div class="chat-sidebar">
+      <!-- Info del chat -->
+      <div class="chat-sidebar">
         <h4>Información del Chat</h4>
         <p><strong>Participantes:</strong></p>
-        <ul>
-        <li>Dev Tester (Tú)</li>
-        <li>Admin Vendraly</li>
-        </ul>
-        <p><strong>Propietario del Proyecto:</strong> Carlos Ruiz</p>
-    </div>
+        <ul id="listaParticipantes"></ul>
+        <p><strong>Propietario del Proyecto:</strong> <span id="chatPropietario">—</span></p>
+      </div>
     </section>
-
   </main>
 
   <footer>

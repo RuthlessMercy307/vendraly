@@ -220,7 +220,14 @@ document.addEventListener('DOMContentLoaded', () => {
   renderProjects();
 });
 
-const usuarioLogueado = sessionStorage.getItem('usuarioLogueado') === '1';
+let usuarioLogueado = false;
+
+fetch('php/verificar_sesion.php')
+  .then(res => res.json())
+  .then(data => {
+    usuarioLogueado = data.logged_in;
+  });
+
 
 function openModal(destino = null) {
   if (usuarioLogueado) {
@@ -288,10 +295,18 @@ function handleLogin(e) {
       alert(data.msg);
       if (data.status === 'ok') {
         closeModal();
-        checkLoginStatus();
+
+        const destino = sessionStorage.getItem('postLoginRedirect');
+        if (destino) {
+          sessionStorage.removeItem('postLoginRedirect');
+          window.location.href = destino;
+        } else {
+          window.location.href = 'dashboard/oportunidades.html';
+        }
       }
     });
 }
+
 
 function checkAuthAndRedirect(url) {
   fetch('php/verificar_sesion.php')
@@ -308,3 +323,16 @@ function checkAuthAndRedirect(url) {
       openModal(); // Por si acaso, muestra el modal si algo falla
     });
 }
+
+// Redirige automáticamente si ya estás logueado y entras en index.html
+fetch('php/verificar_sesion.php')
+  .then(res => res.json())
+  .then(data => {
+    if (data.logged_in) {
+      sessionStorage.setItem('usuarioLogueado', '1');
+      const esIndex = window.location.pathname.endsWith('/index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/vendraly/');
+      if (esIndex) {
+        window.location.href = 'dashboard/oportunidades.html';
+      }
+    }
+  });

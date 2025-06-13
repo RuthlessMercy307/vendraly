@@ -2,7 +2,7 @@
 require 'config.php';
 
 if (!isset($_SESSION['usuario_id'])) {
-    echo json_encode(['status' => 'error', 'msg' => 'No has iniciado sesiÃ³n.']);
+    echo json_encode(['status' => 'error', 'msg' => 'No has iniciado sesi¨®n.']);
     exit;
 }
 
