@@ -1,6 +1,8 @@
 checkLoginStatus();
 cargarConversaciones();
 
+let conversacionAbiertaId = null;
+
 function toggleMenu() {
   const links = document.querySelector('.nav-links');
   links.classList.toggle('open');
@@ -53,11 +55,20 @@ function enviarMensaje(e) {
     .then(data => {
       if (data.status === 'ok') {
         input.value = '';
-        abrirConversacion(conversacionId, document.getElementById("nombreChat").textContent); // Recargar
+
+        const mensajesDiv = document.getElementById("contenedorMensajes");
+
+        const msg = document.createElement("div");
+        msg.className = "mensaje yo";
+        msg.innerHTML = `<div class="burbuja">${texto}</div>`;
+        mensajesDiv.appendChild(msg);
+
+        mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
       } else {
         alert(data.msg || 'Error al enviar mensaje');
       }
     });
+
 }
 
 // Cargar lista de conversaciones
@@ -73,14 +84,35 @@ async function cargarConversaciones() {
     return;
   }
 
+  // Obtener tu propio nombre y rol
+  const session = await fetchUserSession();
+  const miId = session.id;
+  const miRol = session.rol;
+
   data.conversaciones.forEach(conv => {
+    let nombreFinal = conv.nombre;
+
+    if (conv.tipo === 'privado') {
+      const otro = conv.participantes.find(p => p.id != miId);
+
+      if (!otro) {
+        nombreFinal = "Usuario desconocido";
+      } else if (['admin', 'soporte'].includes(otro.rol) && !['admin', 'soporte'].includes(miRol)) {
+        nombreFinal = "Soporte Vendraly";
+      } else {
+        nombreFinal = otro.nombre;
+      }
+    }
+
     const li = document.createElement("li");
     li.dataset.id = conv.id;
-    li.textContent = conv.nombre || "Chat sin nombre";
-    li.addEventListener("click", () => abrirConversacion(conv.id, conv.nombre));
+    li.dataset.nombre = nombreFinal;
+    li.textContent = nombreFinal;
+    li.addEventListener("click", () => abrirConversacion(conv.id, nombreFinal));
     lista.appendChild(li);
   });
 }
+
 
 // Abrir conversación y cargar mensajes
 async function abrirConversacion(id, nombre) {
@@ -91,6 +123,7 @@ async function abrirConversacion(id, nombre) {
 
   titulo.textContent = nombre;
   mensajeForm.dataset.conversacionId = id;
+  conversacionAbiertaId = id;
   mensajesDiv.innerHTML = '';
   participantes.innerHTML = '';
   propietario.textContent = '—';
@@ -124,3 +157,27 @@ async function abrirConversacion(id, nombre) {
 
   mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
 }
+
+async function actualizarMensajes() {
+  if (!conversacionAbiertaId) return;
+
+  const mensajesDiv = document.getElementById("contenedorMensajes");
+
+  const res = await fetch(`../php/ver_mensajes.php?conversacion_id=${conversacionAbiertaId}`);
+  const data = await res.json();
+
+  if (data.status !== "ok") return;
+
+  mensajesDiv.innerHTML = '';
+
+  data.mensajes.forEach(m => {
+    const msg = document.createElement("div");
+    msg.className = `mensaje ${m.es_mio ? "yo" : "otro"}`;
+    msg.innerHTML = `<div class="burbuja">${m.texto}</div>`;
+    mensajesDiv.appendChild(msg);
+  });
+
+  mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
+}
+
+setInterval(actualizarMensajes, 5000); // Cada 5 segundos
