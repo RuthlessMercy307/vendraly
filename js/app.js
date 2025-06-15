@@ -294,6 +294,10 @@ function handleLogin(e) {
     .then(data => {
       alert(data.msg);
       if (data.status === 'ok') {
+        if (data.token) {
+          csrfToken = data.token;
+          document.querySelectorAll('input[name="csrf_token"]').forEach(el => el.value = csrfToken);
+        }
         closeModal();
 
         const destino = sessionStorage.getItem('postLoginRedirect');

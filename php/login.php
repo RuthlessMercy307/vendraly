@@ -28,10 +28,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["rol"] = $user["rol"];
 
         $nombre = htmlspecialchars($user["nombre"], ENT_QUOTES, 'UTF-8');
+        $newToken = csrf_token();
         echo json_encode([
             "status" => "ok",
             "msg" => "Bienvenido " . $nombre,
-            "rol" => $user["rol"]
+            "rol" => $user["rol"],
+            "token" => $newToken
         ]);
     } else {
         echo json_encode(["status" => "error", "msg" => "Credenciales inválidas"]);
