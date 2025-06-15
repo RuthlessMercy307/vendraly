@@ -126,7 +126,7 @@ async function abrirConversacion(id, nombre) {
   conversacionAbiertaId = id;
   mensajesDiv.innerHTML = '';
   participantes.innerHTML = '';
-  propietario.textContent = '—';
+  propietario.textContent = '--';
 
   const res = await fetch(`../php/ver_mensajes.php?conversacion_id=${id}`);
   const data = await res.json();
@@ -136,12 +136,8 @@ async function abrirConversacion(id, nombre) {
     return;
   }
 
-  data.mensajes.forEach(m => {
-    const msg = document.createElement("div");
-    msg.className = `mensaje ${m.es_mio ? "yo" : "otro"}`;
-    msg.innerHTML = `<div class="burbuja">${m.texto}</div>`;
-    mensajesDiv.appendChild(msg);
-  });
+  const session = await fetchUserSession();
+  renderizarMensajes(data, session.id);
 
   if (data.participantes) {
     data.participantes.forEach(p => {
@@ -156,28 +152,109 @@ async function abrirConversacion(id, nombre) {
   }
 
   mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
+
+  if (data.mensajes.length) {
+    const ultimoMensaje = data.mensajes[data.mensajes.length - 1];
+
+    fetch("../php/actualizar_ultima_lectura.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        // No es necesario X-CSRF-Token si lo quitaste
+      },
+      body: new URLSearchParams({
+        conversacion_id: id,
+        mensaje_id: ultimoMensaje.id
+      })
+    });
+  }
+ if (data.leido_por_otro) {
+  const { ultimo_mensaje_id, fecha } = data.leido_por_otro;
+  const misMensajes = mensajesDiv.querySelectorAll('.mensaje.yo');
+
+  if (misMensajes.length) {
+    const ultimo = misMensajes[misMensajes.length - 1];
+    const p = document.createElement('div');
+    p.className = 'visto';
+    p.style.fontSize = '12px';
+    p.style.marginTop = '2px';
+    p.style.color = '#777';
+
+    const vistoTexto = calcularVistoTexto(new Date(fecha)); // ✅ ESTA LÍNEA
+    p.textContent = `✔ ${vistoTexto}`;
+    ultimo.appendChild(p);
+  }
+}
+
+
+
+  // Función para formatear "visto"
+  function calcularVistoTexto(fecha) {
+    const ahora = new Date();
+    const diff = (ahora - fecha) / 1000;
+
+    if (diff < 60) return "Visto hace pocos segundos";
+    if (diff < 3600) return `Visto hace ${Math.floor(diff / 60)} min`;
+    if (diff < 86400) return `Visto hace ${Math.floor(diff / 3600)} hrs`;
+
+    return `Visto el ${fecha.toLocaleDateString()} ${fecha.toLocaleTimeString().slice(0, 5)}`;
+  }
+
 }
 
 async function actualizarMensajes() {
   if (!conversacionAbiertaId) return;
-
-  const mensajesDiv = document.getElementById("contenedorMensajes");
 
   const res = await fetch(`../php/ver_mensajes.php?conversacion_id=${conversacionAbiertaId}`);
   const data = await res.json();
 
   if (data.status !== "ok") return;
 
+  const session = await fetchUserSession();
+  renderizarMensajes(data, session.id);
+}
+
+
+function renderizarMensajes(data, miId) {
+  const mensajesDiv = document.getElementById("contenedorMensajes");
   mensajesDiv.innerHTML = '';
+
+  const leido = data.leido_por_otro;
+  const ultimoLeidoId = leido?.ultimo_mensaje_id;
+  const fechaLeido = leido?.fecha ? new Date(leido.fecha) : null;
 
   data.mensajes.forEach(m => {
     const msg = document.createElement("div");
     msg.className = `mensaje ${m.es_mio ? "yo" : "otro"}`;
-    msg.innerHTML = `<div class="burbuja">${m.texto}</div>`;
+    msg.innerHTML = `
+      <div class="burbuja">${m.texto}</div>
+      <div class="visto-info" style="font-size: 12px; color: #777; margin-top: 3px; text-align: right;"></div>
+    `;
     mensajesDiv.appendChild(msg);
+
+    // Mostrar "Visto" si aplica
+    if (m.es_mio && m.id == ultimoLeidoId && fechaLeido) {
+      const vistoTexto = calcularVistoTexto(fechaLeido);
+      const vistoInfo = msg.querySelector('.visto-info');
+      if (vistoInfo) {
+        vistoInfo.textContent = `✔ ${vistoTexto}`;
+      }
+    }
   });
 
   mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
 }
+
+function calcularVistoTexto(fecha) {
+  const ahora = new Date();
+  const diff = (ahora - fecha) / 1000;
+
+  if (diff < 60) return "Visto hace pocos segundos";
+  if (diff < 3600) return `Visto hace ${Math.floor(diff / 60)} min`;
+  if (diff < 86400) return `Visto hace ${Math.floor(diff / 3600)} hrs`;
+
+  return `Visto el ${fecha.toLocaleDateString()} ${fecha.toLocaleTimeString().slice(0, 5)}`;
+}
+
 
 setInterval(actualizarMensajes, 5000); // Cada 5 segundos

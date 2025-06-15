@@ -15,7 +15,7 @@ if (!$conversacion_id) {
 }
 
 // 1. Obtener mensajes
-$stmt = $pdo->prepare('SELECT texto, emisor_id, fecha FROM mensajes WHERE conversacion_id = ? ORDER BY fecha ASC');
+$stmt = $pdo->prepare('SELECT id, texto, emisor_id, fecha FROM mensajes WHERE conversacion_id = ? ORDER BY fecha ASC');
 $stmt->execute([$conversacion_id]);
 $mensajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -64,10 +64,27 @@ if ($tipo === 'proyecto') {
     $propietario = $stmt->fetchColumn();
 }
 
+// Obtener último mensaje leído por el otro participante
+$stmt = $pdo->prepare("
+    SELECT ultimo_mensaje_id, fecha 
+    FROM ultima_lectura 
+    WHERE conversacion_id = ? AND usuario_id != ?
+");
+$stmt->execute([$conversacion_id, $usuario_id]);
+$lectura_otro = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Devolverlo solo si hay lectura
+if ($lectura_otro) {
+    $lectura_otro['ultimo_mensaje_id'] = (int)$lectura_otro['ultimo_mensaje_id'];
+    $lectura_otro['fecha'] = $lectura_otro['fecha'];
+    $extra['leido_por_otro'] = $lectura_otro;
+}
+
 // 6. Enviar respuesta final
 echo json_encode([
     'status' => 'ok',
     'mensajes' => $mensajes,
     'participantes' => $participantes,
-    'propietario' => $propietario
+    'propietario' => $propietario,
+    'leido_por_otro' => $lectura_otro ?? null
 ]);
