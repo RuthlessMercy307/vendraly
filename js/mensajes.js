@@ -160,7 +160,7 @@ async function abrirConversacion(id, nombre) {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        // No es necesario X-CSRF-Token si lo quitaste
+        "X-CSRF-Token": csrfToken
       },
       body: new URLSearchParams({
         conversacion_id: id,
@@ -212,6 +212,21 @@ async function actualizarMensajes() {
 
   const session = await fetchUserSession();
   renderizarMensajes(data, session.id);
+
+  if (data.mensajes && data.mensajes.length) {
+    const ultimo = data.mensajes[data.mensajes.length - 1];
+    fetch("../php/actualizar_ultima_lectura.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-CSRF-Token": csrfToken
+      },
+      body: new URLSearchParams({
+        conversacion_id: conversacionAbiertaId,
+        mensaje_id: ultimo.id
+      })
+    });
+  }
 }
 
 
