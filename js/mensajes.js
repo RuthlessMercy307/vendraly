@@ -168,38 +168,6 @@ async function abrirConversacion(id, nombre) {
       })
     });
   }
- if (data.leido_por_otro) {
-  const { ultimo_mensaje_id, fecha } = data.leido_por_otro;
-  const misMensajes = mensajesDiv.querySelectorAll('.mensaje.yo');
-
-  if (misMensajes.length) {
-    const ultimo = misMensajes[misMensajes.length - 1];
-    const p = document.createElement('div');
-    p.className = 'visto';
-    p.style.fontSize = '12px';
-    p.style.marginTop = '2px';
-    p.style.color = '#777';
-
-    const vistoTexto = calcularVistoTexto(new Date(fecha)); // ✅ ESTA LÍNEA
-    p.textContent = `✔ ${vistoTexto}`;
-    ultimo.appendChild(p);
-  }
-}
-
-
-
-  // Función para formatear "visto"
-  function calcularVistoTexto(fecha) {
-    const ahora = new Date();
-    const diff = (ahora - fecha) / 1000;
-
-    if (diff < 60) return "Visto hace pocos segundos";
-    if (diff < 3600) return `Visto hace ${Math.floor(diff / 60)} min`;
-    if (diff < 86400) return `Visto hace ${Math.floor(diff / 3600)} hrs`;
-
-    return `Visto el ${fecha.toLocaleDateString()} ${fecha.toLocaleTimeString().slice(0, 5)}`;
-  }
-
 }
 
 async function actualizarMensajes() {
