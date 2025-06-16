@@ -142,3 +142,108 @@ footer a:hover {
     display: block;
   }
 }
+
+.bloque-inicial {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  margin: 30px auto;
+  padding: 10px;
+  max-width: 900px;
+}
+
+.card-special {
+  flex: 1 1 300px;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.card-special:hover {
+  transform: translateY(-5px);
+}
+
+/* Stake */
+.card-stake {
+  background: linear-gradient(160deg, #6a11cb 0%, #2575fc 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-stake::before {
+  content: "✨";
+  font-size: 80px;
+  opacity: 0.05;
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  animation: stars 6s linear infinite;
+}
+
+@keyframes stars {
+  0% { transform: translateY(0); opacity: 0.05; }
+  50% { transform: translateY(10px); opacity: 0.1; }
+  100% { transform: translateY(0); opacity: 0.05; }
+}
+
+.card-stake button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 10px 18px;
+  margin-top: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.card-stake button:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* Fondo de Garantía */
+.card-garantia {
+  background: #ffffff;
+  color: #222;
+  border: 1px solid #e0e0e0;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-garantia::before {
+  content: "🛡️";
+  font-size: 80px;
+  opacity: 0.05;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
+
+.card-garantia::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 6px;
+  background: #4fc3f7;
+  border-radius: 0 8px 8px 0;
+}
+
+.card-garantia button {
+  background: #f1f1f1;
+  border: none;
+  color: #333;
+  padding: 10px 18px;
+  margin-top: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.card-garantia button:hover {
+  background: #e0e0e0;
+}
