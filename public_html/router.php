@@ -10,9 +10,10 @@ $pages = [
     'index.html'
 ];
 
+// Mapeo con slug y con código hash de 8 caracteres
 $map = [];
 foreach ($pages as $p) {
-    $slug = basename($p, '.html');
+    $slug = basename($p, '.html'); // por ejemplo: cuenta, mensajes, etc.
     $map[$slug] = $p;
     $map[substr(md5($p), 0, 8)] = $p;
 }

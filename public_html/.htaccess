@@ -8,7 +8,7 @@ RewriteRule ^(config|logs|archivos_privados|ws|templates|\.git)/ - [F]
 
 Options -Indexes
 
-# Sistema de rutas limpias
+# Sistema de rutas limpias o codificadas
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.+)$ router.php?c=$1 [L,QSA]
+RewriteRule ^([A-Za-z0-9_-]{7,})$ router.php?c=$1 [L,QSA]
