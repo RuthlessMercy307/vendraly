@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head> 
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ver Proyecto – Vendraly</title>
+  <link rel="stylesheet" href="../css/verproyecto.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="navbar">
+      <div class="logo">Vendraly</div>
+      <nav class="nav-links">
+        <a href="oportunidades.html">Oportunidades</a>
+        <a href="crearproyecto.html">Crear Proyecto</a>
+        <a href="mensajes.html">Mensajes</a>
+        <a href="portafolio.html">Portafolio</a>
+        <a href="cuenta.html">Cuenta</a>
+      </nav>
+      <div class="nav-actions nav-links hidden" id="userPanel">
+        <span id="userName"></span>
+        <button class="btn btn-outline" onclick="logout()">Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="chat-container">
+    <section id="proyecto-detalles">
+
+      <a href="oportunidades.html" class="btn btn-outline" style="margin-bottom: 1rem;">← Volver</a>
+
+      <h1 id="titulo-proyecto">[TÍTULO DEL PROYECTO]</h1>
+      <p class="estado-proyecto">Estado: <span id="estado-proyecto">[activo/en_verificacion/etc]</span></p>
+
+      <div class="descripcion">
+        <h2>Resumen</h2>
+        <p id="descripcion-corta">[descripcion_corta]</p>
+
+        <h2>Detalles</h2>
+        <p id="descripcion-larga">[descripcion_larga]</p>
+      </div>
+
+      <div class="info-proyecto">
+        <p>Tipo de proyecto: <strong id="tipo-proyecto">[prestamo/acciones]</strong></p>
+        <p>Categoría: <strong id="categoria">[test, comercio, etc]</strong></p>
+        <p>Publicado por: 
+          <a href="perfil.html?id=[usuario_id]" id="nombre-usuario">[nombre_usuario]</a>
+        </p>
+        <p>Fecha de publicación: <span id="fecha-publicacion"></span></p>
+      </div>
+
+      <div class="finanzas">
+        <h2>Finanzas</h2>
+        <div id="detalle-prestamo">
+          <p>Monto necesario: R$ <span id="necesario"></span></p>
+          <p>Recaudado: R$ <span id="acumulado"></span></p>
+          <p>Plazo: <span id="plazo"></span> meses</p>
+          <p>Retorno estimado: <span id="retorno"></span>%</p>
+        </div>
+
+        <div id="detalle-acciones" style="display: none;">
+          <p>Porcentaje vendido: <span id="porcentaje-vendido"></span>%</p>
+          <p>Disponible: <span id="porcentaje-disponible"></span>%</p>
+          <p>Precio por 0.01%: R$ <span id="precio-porcentaje"></span></p>
+        </div>
+      </div>
+
+      <div class="historial">
+        <h2>Actividad pública</h2>
+        <ul id="movimientos-publicos">
+          <!-- Ej: <li>***asd invirtió R$500</li> -->
+        </ul>
+      </div>
+
+      <div class="acciones">
+        <button onclick="abrirChatGrupo()">💬 Chat del Proyecto</button>
+        <button onclick="abrirChatPrivado()">📩 Mensaje al Creador</button>
+        <button id="btn-invertir">💰 Invertir Ahora</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div style="max-width:1200px;margin:0 auto;text-align:center;">
+      <p>&copy; 2024 Vendraly. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="../js/session.js"></script>
+  <script src="../js/csrf.js"></script>
+  <script src="../js/verproyecto.js"></script>
+  <script>
+    function abrirChatGrupo() {
+      alert("Chat grupal no implementado aún");
+    }
+    function abrirChatPrivado() {
+      alert("Chat privado no implementado aún");
+    }
+
+    // Si no hay sesión, redirige
+    fetch('../php/verificar_sesion.php')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.logged_in) {
+          window.location.href = '../index.html';
+        }
+      });
+  </script>
+</body>
+</html>
