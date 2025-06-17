@@ -2,19 +2,20 @@ async function renderProjects() {
   const grid = document.getElementById('project-grid');
   if (!grid) return;
 
-  const res = await fetch('../php/ver_proyectos_activos.php');
-  const data = await res.json();
+  try {
+    const res = await fetch('../php/ver_proyectos_activos.php');
+    const data = await res.json();
 
-  if (data.status !== 'ok') {
-    grid.innerHTML = '<p>No se pudieron cargar los proyectos.</p>';
-    return;
-  }
+    if (data.status !== 'ok') {
+      grid.innerHTML = '<p>No se pudieron cargar los proyectos.</p>';
+      return;
+    }
 
-  const projects = data.proyectos;
+    const projects = data.proyectos;
 
-  projects.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'card';
+    projects.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'card';
 
     const header = document.createElement('div');
     header.className = 'header';
@@ -170,12 +171,20 @@ progressLabel.innerHTML = `
 
     grid.appendChild(card);
   });
+  } catch (err) {
+    console.error('Error al cargar proyectos', err);
+    grid.innerHTML = '<p>No se pudo conectar con el servidor.</p>';
+  }
 }
 
 
 function logout() {
   fetch('../php/logout.php')
-    .then(() => window.location.href = "../index.html");
+    .then(() => window.location.href = "../index.html")
+    .catch(err => {
+      console.error('Error al cerrar sesión', err);
+      alert('No se pudo conectar con el servidor. Intente nuevamente más tarde.');
+    });
 }
 
 function toggleMenu() {
