@@ -1,12 +1,13 @@
 <?php
 // config.php
-$host = getenv('DB_HOST') ?: 'localhost';
-$dbname = getenv('DB_NAME') ?: 'cambblym_vendraly';
-$user = getenv('DB_USER') ?: 'cambblym_vendraly';
-$pass = getenv('DB_PASS') ?: '2j)I]V4G^1dV';
 
-if (!$user || !$pass) {
-    die('Database credentials not provided. Set DB_USER and DB_PASS environment variables.');
+$host = getenv('DB_HOST');
+$dbname = getenv('DB_NAME');
+$user = getenv('DB_USER');
+$pass = getenv('DB_PASS');
+
+if (!$host || !$dbname || !$user || !$pass) {
+    die('Database credentials not provided. Set DB_HOST, DB_NAME, DB_USER and DB_PASS environment variables.');
 }
 
 try {
