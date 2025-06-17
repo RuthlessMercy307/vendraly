@@ -1,4 +1,5 @@
 const WebSocket = require('ws');
+const http = require('http');
 const mysql = require('mysql2/promise');
 const config = require('./config.js');
 
@@ -16,6 +17,41 @@ const wss = new WebSocket.Server({ port: 8080 });
 
 const clients = new Map(); // userId -> ws
 
+async function getSessionUserId(req) {
+  return new Promise(resolve => {
+    const cookies = req.headers?.cookie || '';
+    if (!cookies) return resolve(null);
+
+    const options = {
+      hostname: 'localhost',
+      port: 8000,
+      path: '/php/perfil.php',
+      method: 'GET',
+      headers: { Cookie: cookies }
+    };
+
+    const r = http.request(options, res => {
+      let body = '';
+      res.on('data', chunk => { body += chunk; });
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(body);
+          if (json.status === 'ok' && json.perfil && json.perfil.id) {
+            resolve(json.perfil.id);
+          } else {
+            resolve(null);
+          }
+        } catch (e) {
+          resolve(null);
+        }
+      });
+    });
+
+    r.on('error', () => resolve(null));
+    r.end();
+  });
+}
+
 async function broadcastToConversation(convId, messageData) {
   const [rows] = await pool.execute(
     'SELECT usuario_id FROM miembros_conversacion WHERE conversacion_id = ?',
@@ -32,6 +68,11 @@ async function broadcastToConversation(convId, messageData) {
 async function handleMessage(ws, data) {
   switch (data.type) {
     case 'identificar':
+      const sessionId = await getSessionUserId(ws.req);
+      if (sessionId !== data.usuario_id) {
+        ws.close();
+        break;
+      }
       ws.userId = data.usuario_id;
       clients.set(data.usuario_id, ws);
       break;
@@ -141,7 +182,8 @@ async function handleMessage(ws, data) {
   }
 }
 
-wss.on('connection', ws => {
+wss.on('connection', (ws, req) => {
+  ws.req = req;
   ws.on('message', async msg => {
     let data;
     try {
