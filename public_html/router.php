@@ -12,6 +12,8 @@ $pages = [
 
 $map = [];
 foreach ($pages as $p) {
+    $slug = basename($p, '.html');
+    $map[$slug] = $p;
     $map[substr(md5($p), 0, 8)] = $p;
 }
 

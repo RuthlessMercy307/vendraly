@@ -1,7 +1,7 @@
-checkLoginStatus();
-cargarConversaciones();
-
 let conversacionAbiertaId = null;
+let usuarioId = null;
+
+checkLoginStatus();
 
 function toggleMenu() {
   const links = document.querySelector('.nav-links');
@@ -13,6 +13,8 @@ async function checkLoginStatus() {
   if (data.logged_in) {
     document.getElementById('userPanel').classList.remove('hidden');
     document.getElementById('userName').innerText = `Hola, ${data.nombre}`;
+    usuarioId = data.id;
+    initWebSocket(usuarioId);
   } else {
     window.location.href = "../index.html";
   }
@@ -23,7 +25,6 @@ function logout() {
     .then(() => window.location.href = "../index.html");
 }
 
-// Formulario de envío de mensaje
 const mensajeForm = document.getElementById('mensajeForm');
 if (mensajeForm) {
   mensajeForm.addEventListener('submit', enviarMensaje);
@@ -33,93 +34,53 @@ function enviarMensaje(e) {
   e.preventDefault();
   const input = mensajeForm.querySelector('input[type="text"]');
   const texto = input.value.trim();
-  const conversacionId = mensajeForm.dataset.conversacionId;
-
-  if (!texto || !conversacionId) return;
-
-  const body = new URLSearchParams({
-    conversacion_id: conversacionId,
-    texto,
-    csrf_token: csrfToken
-  });
-
-  fetch('../php/enviar_mensaje.php', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'X-CSRF-Token': csrfToken
-    },
-    body
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (data.status === 'ok') {
-        input.value = '';
-
-        const mensajesDiv = document.getElementById("contenedorMensajes");
-
-        const msg = document.createElement("div");
-        msg.className = "mensaje yo";
-        msg.innerHTML = `<div class="burbuja">${texto}</div>`;
-        mensajesDiv.appendChild(msg);
-
-        mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
-      } else {
-        alert(data.msg || 'Error al enviar mensaje');
-      }
-    });
-
+  if (!texto || !conversacionAbiertaId) return;
+  sendWS({ type: 'mensaje', conversacion_id: conversacionAbiertaId, texto });
+  input.value = '';
 }
 
-// Cargar lista de conversaciones
-async function cargarConversaciones() {
-  const lista = document.getElementById("listaChats");
+function handleWSMessage(data) {
+  switch (data.type) {
+    case 'lista_conversaciones':
+      renderConversaciones(data.conversaciones);
+      break;
+    case 'mensajes':
+      mostrarConversacion(data);
+      break;
+    case 'mensaje':
+      recibirMensaje(data);
+      break;
+  }
+}
+window.handleWSMessage = handleWSMessage;
+
+function renderConversaciones(convs) {
+  const lista = document.getElementById('listaChats');
   lista.innerHTML = '';
-
-  const res = await fetch("../php/ver_conversaciones.php");
-  const data = await res.json();
-
-  if (data.status !== "ok" || !data.conversaciones.length) {
-    lista.innerHTML = "<li><strong>No hay conversaciones</strong></li>";
+  if (!convs.length) {
+    lista.innerHTML = '<li><strong>No hay conversaciones</strong></li>';
     return;
   }
-
-  // Obtener tu propio nombre y rol
-  const session = await fetchUserSession();
-  const miId = session.id;
-  const miRol = session.rol;
-
-  data.conversaciones.forEach(conv => {
+  convs.forEach(conv => {
     let nombreFinal = conv.nombre;
-
     if (conv.tipo === 'privado') {
-      const otro = conv.participantes.find(p => p.id != miId);
-
-      if (!otro) {
-        nombreFinal = "Usuario desconocido";
-      } else if (['admin', 'soporte'].includes(otro.rol) && !['admin', 'soporte'].includes(miRol)) {
-        nombreFinal = "Soporte Vendraly";
-      } else {
-        nombreFinal = otro.nombre;
-      }
+      const otro = conv.participantes.find(p => p.id != usuarioId);
+      if (otro) nombreFinal = otro.nombre;
     }
-
-    const li = document.createElement("li");
+    const li = document.createElement('li');
     li.dataset.id = conv.id;
     li.dataset.nombre = nombreFinal;
     li.textContent = nombreFinal;
-    li.addEventListener("click", () => abrirConversacion(conv.id, nombreFinal));
+    li.addEventListener('click', () => abrirConversacion(conv.id, nombreFinal));
     lista.appendChild(li);
   });
 }
 
-
-// Abrir conversación y cargar mensajes
-async function abrirConversacion(id, nombre) {
-  const mensajesDiv = document.getElementById("contenedorMensajes");
-  const titulo = document.getElementById("nombreChat");
-  const participantes = document.getElementById("listaParticipantes");
-  const propietario = document.getElementById("chatPropietario");
+function abrirConversacion(id, nombre) {
+  const mensajesDiv = document.getElementById('contenedorMensajes');
+  const titulo = document.getElementById('nombreChat');
+  const participantes = document.getElementById('listaParticipantes');
+  const propietario = document.getElementById('chatPropietario');
 
   titulo.textContent = nombre;
   mensajeForm.dataset.conversacionId = id;
@@ -128,78 +89,52 @@ async function abrirConversacion(id, nombre) {
   participantes.innerHTML = '';
   propietario.textContent = '--';
 
-  const res = await fetch(`../php/ver_mensajes.php?conversacion_id=${id}`);
-  const data = await res.json();
+  sendWS({ type: 'abrir_conversacion', conversacion_id: id });
+}
 
-  if (data.status !== "ok") {
-    mensajesDiv.innerHTML = "<p>Error al cargar mensajes</p>";
-    return;
-  }
+function mostrarConversacion(data) {
+  const mensajesDiv = document.getElementById('contenedorMensajes');
+  const participantes = document.getElementById('listaParticipantes');
+  const propietario = document.getElementById('chatPropietario');
 
-  const session = await fetchUserSession();
-  renderizarMensajes(data, session.id);
+  mensajesDiv.innerHTML = '';
+  participantes.innerHTML = '';
 
   if (data.participantes) {
     data.participantes.forEach(p => {
-      const li = document.createElement("li");
-      li.textContent = p.nombre + (p.es_mio ? " (Tú)" : "");
+      const li = document.createElement('li');
+      li.textContent = p.nombre + (p.es_mio ? ' (Tú)' : '');
       participantes.appendChild(li);
     });
   }
-
   if (data.propietario) {
     propietario.textContent = data.propietario;
   }
 
-  mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
-
-  if (data.mensajes.length) {
-    const ultimoMensaje = data.mensajes[data.mensajes.length - 1];
-
-    fetch("../php/actualizar_ultima_lectura.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-CSRF-Token": csrfToken
-      },
-      body: new URLSearchParams({
-        conversacion_id: id,
-        mensaje_id: ultimoMensaje.id
-      })
-    });
-  }
-}
-
-async function actualizarMensajes() {
-  if (!conversacionAbiertaId) return;
-
-  const res = await fetch(`../php/ver_mensajes.php?conversacion_id=${conversacionAbiertaId}`);
-  const data = await res.json();
-
-  if (data.status !== "ok") return;
-
-  const session = await fetchUserSession();
-  renderizarMensajes(data, session.id);
+  renderizarMensajes(data, usuarioId);
 
   if (data.mensajes && data.mensajes.length) {
     const ultimo = data.mensajes[data.mensajes.length - 1];
-    fetch("../php/actualizar_ultima_lectura.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-CSRF-Token": csrfToken
-      },
-      body: new URLSearchParams({
-        conversacion_id: conversacionAbiertaId,
-        mensaje_id: ultimo.id
-      })
-    });
+    sendWS({ type: 'visto', conversacion_id: data.conversacion_id, mensaje_id: ultimo.id });
   }
 }
 
+function recibirMensaje(data) {
+  if (data.conversacion_id === conversacionAbiertaId) {
+    const mensajesDiv = document.getElementById('contenedorMensajes');
+    const msg = document.createElement('div');
+    msg.className = data.emisor_id === usuarioId ? 'mensaje yo' : 'mensaje otro';
+    msg.innerHTML = `<div class="burbuja">${data.texto}</div>`;
+    mensajesDiv.appendChild(msg);
+    mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
+    sendWS({ type: 'visto', conversacion_id: data.conversacion_id, mensaje_id: data.mensaje_id });
+  } else {
+    // TODO: notificaciones para otras conversaciones
+  }
+}
 
 function renderizarMensajes(data, miId) {
-  const mensajesDiv = document.getElementById("contenedorMensajes");
+  const mensajesDiv = document.getElementById('contenedorMensajes');
   mensajesDiv.innerHTML = '';
 
   const leido = data.leido_por_otro;
@@ -207,15 +142,11 @@ function renderizarMensajes(data, miId) {
   const fechaLeido = leido?.fecha ? new Date(leido.fecha) : null;
 
   data.mensajes.forEach(m => {
-    const msg = document.createElement("div");
-    msg.className = `mensaje ${m.es_mio ? "yo" : "otro"}`;
-    msg.innerHTML = `
-      <div class="burbuja">${m.texto}</div>
-      <div class="visto-info" style="font-size: 12px; color: #777; margin-top: 3px; text-align: right;"></div>
-    `;
+    const msg = document.createElement('div');
+    msg.className = `mensaje ${m.es_mio ? 'yo' : 'otro'}`;
+    msg.innerHTML = `<div class="burbuja">${m.texto}</div><div class="visto-info" style="font-size:12px;color:#777;margin-top:3px;text-align:right;"></div>`;
     mensajesDiv.appendChild(msg);
 
-    // Mostrar "Visto" si aplica
     if (m.es_mio && m.id == ultimoLeidoId && fechaLeido) {
       const vistoTexto = calcularVistoTexto(fechaLeido);
       const vistoInfo = msg.querySelector('.visto-info');
@@ -231,13 +162,8 @@ function renderizarMensajes(data, miId) {
 function calcularVistoTexto(fecha) {
   const ahora = new Date();
   const diff = (ahora - fecha) / 1000;
-
-  if (diff < 60) return "Visto hace pocos segundos";
+  if (diff < 60) return 'Visto hace pocos segundos';
   if (diff < 3600) return `Visto hace ${Math.floor(diff / 60)} min`;
   if (diff < 86400) return `Visto hace ${Math.floor(diff / 3600)} hrs`;
-
-  return `Visto el ${fecha.toLocaleDateString()} ${fecha.toLocaleTimeString().slice(0, 5)}`;
+  return `Visto el ${fecha.toLocaleDateString()} ${fecha.toLocaleTimeString().slice(0,5)}`;
 }
-
-
-setInterval(actualizarMensajes, 5000); // Cada 5 segundos

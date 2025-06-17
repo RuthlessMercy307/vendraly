@@ -1,6 +1,6 @@
 # Proteger directorios sensibles
 RewriteEngine On
-RewriteRule ^(config|logs|archivos_privados|\.git)/ - [F]
+RewriteRule ^(config|logs|archivos_privados|ws|templates|\.git)/ - [F]
 
 <FilesMatch "\.(env|sql|bak|ini)$">
   Require all denied
@@ -11,4 +11,4 @@ Options -Indexes
 # Sistema de rutas limpias
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^([A-Za-z0-9]{7,})$ router.php?c=$1 [L,QSA]
+RewriteRule ^(.+)$ router.php?c=$1 [L,QSA]
