@@ -1,6 +1,9 @@
 require('dotenv').config({ path: __dirname + '/.env' });
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const rateLimit = require('express-rate-limit');
+const winston = require('winston');
 const http = require('http');
 const WebSocket = require('ws');
 const mysql = require('mysql2/promise');
@@ -9,6 +12,11 @@ const config = require('./config');
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+
+const logger = winston.createLogger({
+  level: 'info',
+  transports: [new winston.transports.Console()]
+});
 
 const pool = mysql.createPool({
   host: config.host,
@@ -20,45 +28,53 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-app.use(cors());
+const corsOptions = {
+  origin: ['https://vendraly.com'],
+  credentials: true
+};
+app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Rutas de la API (🌐 rutas públicas y privadas)
-app.use('/api/register', require('./api/register'));
-app.use('/api/login', require('./api/login'));
-app.use('/api/logout', require('./api/logout'));
-app.use('/api/verificar_sesion', require('./api/verificar_sesion'));
-app.use('/api/verificar_email', require('./api/verificar_email'));
-app.use('/api/verificar_token_estado', require('./api/verificar_token_estado'));
-app.use('/api/test_correo', require('./api/test_correo'));
+app.use('/api/register', authLimiter, require('./api/auth/register'));
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10 });
+app.use('/api/login', authLimiter, require('./api/auth/login'));
+app.use('/api/logout', require('./api/auth/logout'));
+app.use('/api/refresh', require('./api/auth/refresh'));
+app.use('/api/cambiar_password', require('./api/auth/cambiar_password'));
+app.use('/api/verificar_sesion', require('./api/auth/verificar_sesion'));
+app.use('/api/verificar_email', require('./api/auth/verificar_email'));
+app.use('/api/verificar_token_estado', require('./api/auth/verificar_token_estado'));
+app.use('/api/test_correo', require('./api/utils/test_correo'));
 
-app.use('/api/crear_proyecto', require('./api/crear_proyecto'));
-app.use('/api/proyectos_activos', require('./api/proyectos_activos'));
-app.use('/api/ver_mis_proyectos', require('./api/ver_mis_proyectos'));
-app.use('/api/portafolio_datos', require('./api/portafolio_datos'));
+app.use('/api/crear_proyecto', require('./api/projects/crear_proyecto'));
+app.use('/api/proyectos_activos', require('./api/projects/proyectos_activos'));
+app.use('/api/ver_mis_proyectos', require('./api/projects/ver_mis_proyectos'));
+app.use('/api/portafolio_datos', require('./api/projects/portafolio_datos'));
 
-app.use('/api/mi_plan', require('./api/mi_plan'));
-app.use('/api/activar_plan', require('./api/activar_plan'));
+app.use('/api/mi_plan', require('./api/business/mi_plan'));
+app.use('/api/activar_plan', require('./api/business/activar_plan'));
 
-app.use('/api/negocio_actual', require('./api/negocio_actual'));
-app.use('/api/actualizar_negocio', require('./api/actualizar_negocio'));
-app.use('/api/elegir_plan', require('./api/elegir_plan'));
-app.use('/api/registrar_negocio', require('./api/registrar_negocio'));
-app.use('/api/usuarios_sgw', require('./api/usuarios_sgw'));
-app.use('/api/crear_usuario_sgw', require('./api/crear_usuario_sgw'));
-app.use('/api/eliminar_usuario_sgw', require('./api/eliminar_usuario_sgw'));
-app.use('/api/login_sgw', require('./api/login_sgw'));
+app.use('/api/negocio_actual', require('./api/business/negocio_actual'));
+app.use('/api/actualizar_negocio', require('./api/business/actualizar_negocio'));
+app.use('/api/elegir_plan', require('./api/business/elegir_plan'));
+app.use('/api/registrar_negocio', require('./api/business/registrar_negocio'));
+app.use('/api/usuarios_sgw', require('./api/users/usuarios_sgw'));
+app.use('/api/crear_usuario_sgw', require('./api/users/crear_usuario_sgw'));
+app.use('/api/eliminar_usuario_sgw', require('./api/users/eliminar_usuario_sgw'));
+app.use('/api/login_sgw', authLimiter, require('./api/auth/login_sgw'));
 
-app.use('/api/inventario', require('./api/inventario'));
-app.use('/api/item', require('./api/item'));
-app.use('/api/salvar_item', require('./api/salvar_item'));
-app.use('/api/entrada_inventario', require('./api/entrada_inventario'));
-app.use('/api/conversao_insumo', require('./api/conversao_insumo'));
-app.use('/api/receita_produto', require('./api/receita_produto'));
-app.use('/api/receita_produto_lista', require('./api/receita_produto_lista'));
-app.use('/api/remover_ingrediente', require('./api/remover_ingrediente'));
-app.use('/api/estoque_alerta', require('./api/estoque_alerta'));
+app.use('/api/inventario', require('./api/inventory/inventario'));
+app.use('/api/item', require('./api/inventory/item'));
+app.use('/api/salvar_item', require('./api/inventory/salvar_item'));
+app.use('/api/entrada_inventario', require('./api/inventory/entrada_inventario'));
+app.use('/api/conversao_insumo', require('./api/inventory/conversao_insumo'));
+app.use('/api/receita_produto', require('./api/inventory/receita_produto'));
+app.use('/api/receita_produto_lista', require('./api/inventory/receita_produto_lista'));
+app.use('/api/remover_ingrediente', require('./api/inventory/remover_ingrediente'));
+app.use('/api/estoque_alerta', require('./api/inventory/estoque_alerta'));
 
 
 // WebSocket 💬
@@ -238,4 +254,8 @@ wss.on('connection', ws => {
 
 server.listen(8080, () => {
   console.log('🚀 Servidor WebSocket + API corriendo en puerto 8080');
+});
+
+process.on('unhandledRejection', err => {
+  logger.error(err);
 });

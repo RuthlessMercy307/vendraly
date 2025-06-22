@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const mysql = require('mysql2/promise');
+const { body, validationResult } = require('express-validator');
 const config = require('../config');
 const { enviarVerificacion } = require('../utils/mailer');
 
@@ -47,12 +48,19 @@ async function crearChatConSoporte(nuevoUsuarioId, soporteId = 8) {
 }
 
 // Registro de usuario
-router.post('/', async (req, res) => {
-  const { nombre, email, telefono, password } = req.body;
+router.post(
+  '/',
+  body('nombre').notEmpty(),
+  body('email').isEmail().normalizeEmail(),
+  body('telefono').notEmpty(),
+  body('password').isLength({ min: 6 }),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ status: 'error', msg: 'Datos inválidos' });
+    }
 
-  if (!nombre || !email || !telefono || !password) {
-    return res.status(400).json({ status: 'error', msg: 'Faltan campos obligatorios' });
-  }
+    const { nombre, email, telefono, password } = req.body;
 
   try {
     const [existing] = await pool.execute('SELECT id FROM usuarios WHERE email = ?', [email]);
