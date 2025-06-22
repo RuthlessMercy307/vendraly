@@ -20,8 +20,9 @@
         <a href="#" onclick="openModal('dashboard/oportunidades.html')">Publicar Proyecto</a>
       </nav>
       <div class="nav-actions nav-links" id="authButtons">
+        <!-- Botones visibles cuando no ha iniciado sesión -->
         <button class="btn btn-outline" onclick="openModal()">Login</button>
-        <button class="btn btn-primary" onclick="openModal()">Registrarse</button>
+        <button class="btn btn-primary" onclick="openModal('register')">Registrarse</button>
       </div>
       <div class="nav-actions nav-links hidden" id="userPanel">
         <span id="userName"></span>
@@ -99,9 +100,9 @@
       <h2>Inicia sesión en <span class="highlight">Vendraly</span></h2>
       <form class="auth-form" onsubmit="handleLogin(event)">
         <label>Email</label>
-        <input type="email" placeholder="tu@email.com" required>
+        <input type="email" placeholder="tu@email.com" name="emaillogin" required>
         <label>Contraseña</label>
-        <input type="password" placeholder="********" required>
+        <input type="password" placeholder="********" name="passwordlogin"required>
         <button type="submit" class="btn btn-primary w-full">Entrar</button>
       </form>
       <p class="modal-footer">No tienes cuenta? <a href="#" onclick="switchToRegister()">Regístrate</a></p>
@@ -112,42 +113,18 @@
       <h2>Crea tu cuenta en <span class="highlight">Vendraly</span></h2>
       <form class="auth-form" onsubmit="handleRegister(event)">
         <label>Nombre completo</label>
-        <input type="text" placeholder="Tu nombre" required>
+        <input type="text" placeholder="Tu nombre" name="nameregister" required>
         <label>Email</label>
-        <input type="email" placeholder="tu@email.com" required>
+        <input type="email" placeholder="tu@email.com" name="emailregister" required>
         <label>Contraseña</label>
-        <input type="password" placeholder="********" required>
+        <input type="password" placeholder="********" name="passwordregister" required>
         <button type="submit" class="btn btn-primary w-full">Registrarse</button>
       </form>
       <p class="modal-footer">¿Ya tienes cuenta? <a href="#" onclick="switchToLogin()">Inicia sesión</a></p>
     </div>
   </div>
 </div>
-
-
-<script src="js/csrf.js"></script>
+<div id="toastContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 10001;"></div>
 <script src="js/app.js"></script>
-
-<script>
-function checkLoginStatus() {
-  fetch('php/verificar_sesion.php')
-    .then(res => res.json())
-    .then(data => {
-      if (data.logged_in) {
-        document.getElementById('authButtons').classList.add('hidden');
-        document.getElementById('userPanel').classList.remove('hidden');
-        document.getElementById('userName').innerText = `Hola, ${data.nombre}`;
-      }
-    });
-}
-
-function logout() {
-  fetch('php/logout.php')
-    .then(() => location.reload());
-}
-
-checkLoginStatus();
-</script>
-
 </body>
 </html>

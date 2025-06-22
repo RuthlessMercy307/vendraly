@@ -2,6 +2,9 @@ let conversacionAbiertaId = null;
 let usuarioId = null;
 
 checkLoginStatus();
+setInterval(() => {
+  sendWS({ type: 'obtener_conversaciones' });
+}, 15000); // cada 15 segundos
 
 function toggleMenu() {
   const links = document.querySelector('.nav-links');
@@ -67,10 +70,17 @@ function renderConversaciones(convs) {
       const otro = conv.participantes.find(p => p.id != usuarioId);
       if (otro) nombreFinal = otro.nombre;
     }
+
     const li = document.createElement('li');
     li.dataset.id = conv.id;
     li.dataset.nombre = nombreFinal;
     li.textContent = nombreFinal;
+
+    // Agrega clase visual si tiene mensajes no leídos
+    if (conv.no_leido) {
+      li.classList.add('no-leido');
+    }
+
     li.addEventListener('click', () => abrirConversacion(conv.id, nombreFinal));
     lista.appendChild(li);
   });
@@ -90,6 +100,8 @@ function abrirConversacion(id, nombre) {
   propietario.textContent = '--';
 
   sendWS({ type: 'abrir_conversacion', conversacion_id: id });
+  const liActivo = document.querySelector(`li[data-id="${id}"]`);
+  if (liActivo) liActivo.classList.remove('no-leido');
 }
 
 function mostrarConversacion(data) {
@@ -129,7 +141,11 @@ function recibirMensaje(data) {
     mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
     sendWS({ type: 'visto', conversacion_id: data.conversacion_id, mensaje_id: data.mensaje_id });
   } else {
-    // TODO: notificaciones para otras conversaciones
+    // Agrega punto rojo en lista si mensaje llega fuera del chat abierto
+    const li = document.querySelector(`li[data-id="${data.conversacion_id}"]`);
+    if (li && !li.classList.contains('no-leido')) {
+      li.classList.add('no-leido');
+    }
   }
 }
 

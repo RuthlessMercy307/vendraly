@@ -238,3 +238,11 @@ footer a:hover {
   text-align: right;
   margin-right: 10px;
 }
+
+#listaChats li.no-leido::after {
+  content: '●';
+  color: red;
+  font-size: 14px;
+  margin-left: 8px;
+  vertical-align: middle;
+}

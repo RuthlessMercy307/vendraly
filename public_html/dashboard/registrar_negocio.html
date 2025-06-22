@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrar Negocio – Vendraly</title>
+  <link rel="stylesheet" href="../css/registrar_negocio.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+  <div class="navbar">
+    <div class="logo">Vendraly</div>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <nav class="nav-links">
+      <a href="portafolio.html">Volver</a>
+    </nav>
+    <div class="nav-actions nav-links hidden" id="userPanel">
+      <span id="userName"></span>
+      <button class="btn btn-outline" onclick="logout()">Salir</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="form-container">
+    <h2>Registrar / Editar tu Negocio</h2>
+    <form id="formNegocio">
+      <label>Nombre del Negocio</label>
+      <input type="text" name="nombre" required maxlength="150">
+
+      <label>Descripción</label>
+      <textarea name="descripcion" rows="4" maxlength="1000"></textarea>
+
+      <label>Tipo</label>
+      <select name="tipo" required>
+        <option value="restaurante">Restaurante</option>
+        <option value="tienda">Tienda</option>
+        <option value="distribuidor">Distribuidor</option>
+        <option value="otro">Otro</option>
+      </select>
+
+      <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+  </section>
+</main>
+
+<footer>
+  <div style="max-width:1200px;margin:0 auto;text-align:center;">
+    <p>&copy; 2024 Vendraly. Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+<script src="../js/session.js"></script>
+<script src="../js/registrar_negocio.js"></script>
+</body>
+</html>

@@ -26,7 +26,6 @@
             </div>
         </div>
     </header>
-
   <section class="projects">
     <div style="text-align:center;margin-bottom:2rem;">
         <section class="bloque-inicial">
@@ -35,7 +34,6 @@
           <p>Participa en proyectos especiales y obtén recompensas.</p>
           <button>Ver detalles</button>
         </div>
-
         <div class="card-garantia card-special">
           <h2>Fondo de Garantía</h2>
           <p>Protege tus inversiones con un fondo de garantía.</p>
@@ -47,20 +45,15 @@
     </div>
     <div id="project-grid" class="project-grid"></div>
     <div style="text-align:center;margin-top:2rem;">
-      <button onclick="openModal('dashboard/oportunidades.html')" class="btn btn-outline">Ver Todos los Proyectos</button>
+      <button id="btn-cargar-mas" class="btn btn-outline">Cargar más proyectos</button>
     </div>
   </section>
-
-
   <footer>
     <div style="max-width:1200px;margin:0 auto;">
       <p>&copy; 2024 Vendraly. Todos los derechos reservados.</p>
     </div>
   </footer>
-
-<script src="../js/session.js"></script>
-<script src="../js/csrf.js"></script>
+<div id="toastContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
 <script src="../js/oportunidades.js"></script>
-
 </body>
 </html>

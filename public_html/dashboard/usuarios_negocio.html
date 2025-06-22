@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Subcuentas del Negocio – Vendraly SGW</title>
+  <link rel="stylesheet" href="../css/usuarios_negocio.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="navbar">
+      <div class="logo">Vendraly</div>
+      <nav class="nav-links">
+        <a href="portafolio.html">Volver</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h2>Usuarios del Negocio</h2>
+    <button class="btn btn-success" onclick="mostrarFormulario()">+ Añadir Usuario</button>
+
+    <div id="formularioUsuario" class="hidden">
+      <h3>Nuevo Usuario</h3>
+      <form id="formNuevoUsuario">
+        <input type="text" placeholder="Nombre" name="nombre" required>
+        <input type="text" placeholder="Usuario" name="usuario" required>
+        <input type="password" placeholder="Contraseña" name="password" required>
+        <select name="rol" required>
+          <option value="mesero">Mesero</option>
+          <option value="cajero">Cajero</option>
+          <option value="cocinero">Cocinero</option>
+          <option value="delivery">Delivery</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-outline" onclick="ocultarFormulario()">Cancelar</button>
+      </form>
+    </div>
+
+    <section id="listaUsuarios">
+      <!-- Aquí se cargarán los usuarios con JS -->
+    </section>
+  </main>
+
+  <script src="../js/session.js"></script>
+  <script src="../js/usuarios_negocio.js"></script>
+</body>
+</html>

@@ -1,21 +1,37 @@
-async function renderProjects() {
+let paginaActual = 1;
+let cargando = false;
+
+async function renderProjects(pagina = 1) {
   const grid = document.getElementById('project-grid');
-  if (!grid) return;
+  if (!grid || cargando) return;
 
-  try {
-    const res = await fetch('../php/ver_proyectos_activos.php');
-    const data = await res.json();
+  cargando = true;
 
-    if (data.status !== 'ok') {
-      grid.innerHTML = '<p>No se pudieron cargar los proyectos.</p>';
-      return;
+  const res = await fetch(`/api/proyectos_activos?pagina=${pagina}`, {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('vendraly_token')
     }
+  });
 
-    const projects = data.proyectos;
+  const data = await res.json();
+  cargando = false;
 
-    projects.forEach(p => {
-      const card = document.createElement('div');
-      card.className = 'card';
+  if (data.status !== 'ok') {
+    grid.innerHTML += '<p>No se pudieron cargar los proyectos.</p>';
+    return;
+  }
+
+  if (data.proyectos.length === 0) {
+    mostrarToast("No hay más proyectos para mostrar", "ok");
+    document.getElementById('btn-cargar-mas')?.remove();
+    return;
+  }
+
+  const projects = data.proyectos;
+
+  projects.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'card';
 
     const header = document.createElement('div');
     header.className = 'header';
@@ -171,39 +187,82 @@ progressLabel.innerHTML = `
 
     grid.appendChild(card);
   });
-  } catch (err) {
-    console.error('Error al cargar proyectos', err);
-    grid.innerHTML = '<p>No se pudo conectar con el servidor.</p>';
-  }
 }
 
 
 function logout() {
-  fetch('../php/logout.php')
-    .then(() => window.location.href = "../index.html")
-    .catch(err => {
-      console.error('Error al cerrar sesión', err);
-      alert('No se pudo conectar con el servidor. Intente nuevamente más tarde.');
-    });
+  localStorage.removeItem('vendraly_token');
+  window.location.href = "../index.html";
 }
+
 
 function toggleMenu() {
   const links = document.querySelector('.nav-links');
   links.classList.toggle('open');
 }
 
-async function checkLoginStatus() {
-  const data = await fetchUserSession();
-  if (data.logged_in) {
-    document.getElementById('userPanel').classList.remove('hidden');
-    document.getElementById('userName').innerText = `Hola, ${data.nombre}`;
-  } else {
-    window.location.href = "../index.html";
+async function fetchUserSession() {
+  try {
+    const res = await fetch('/api/verificar_sesion', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('vendraly_token')
+      }
+    });
+    return await res.json();
+  } catch (e) {
+    return { logged_in: false };
   }
 }
 
+async function checkLoginStatus() {
+  const data = await fetchUserSession();
+  if (!data.logged_in) {
+    window.location.href = "../index.html";
+    return;
+  }
+
+  if (!data.verificado) {
+    mostrarToast("Primero debes verificar tu correo para acceder", "error");
+    window.location.href = "../index.html";
+    return;
+  }
+
+  document.getElementById('userPanel').classList.remove('hidden');
+  document.getElementById('userName').innerText = `Hola, ${data.nombre}`;
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
   checkLoginStatus();
-  renderProjects();
+  renderProjects(paginaActual);
+
+  const btnCargarMas = document.getElementById('btn-cargar-mas');
+  if (btnCargarMas) {
+    btnCargarMas.addEventListener('click', () => {
+      paginaActual++;
+      renderProjects(paginaActual);
+    });
+  }
 });
 
+
+function mostrarToast(msg, tipo = 'ok') {
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + tipo;
+  toast.innerText = msg;
+  Object.assign(toast.style, {
+    background: tipo === 'error' ? '#e74c3c' : '#2ecc71',
+    color: 'white',
+    padding: '10px 15px',
+    marginTop: '10px',
+    borderRadius: '5px',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+    transition: 'opacity 0.3s ease'
+  });
+  const container = document.getElementById('toastContainer');
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = 0;
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}

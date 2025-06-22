@@ -78,6 +78,31 @@ function toggleMenu() {
   links.classList.toggle('open');
 }
 
+function mostrarToast(msg, tipo = 'info') {
+  const cont = document.getElementById('toastContainer');
+  if (!cont) return;
+
+  const toast = document.createElement('div');
+  toast.className = `toast ${tipo}`;
+  toast.innerText = msg;
+
+  Object.assign(toast.style, {
+    background: tipo === 'error' ? '#dc2626' : (tipo === 'ok' ? '#16a34a' : '#3b82f6'),
+    color: 'white',
+    padding: '10px 16px',
+    borderRadius: '8px',
+    marginTop: '8px',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+    animation: 'fadein 0.5s, fadeout 0.5s 2.5s'
+  });
+
+  cont.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
 function renderProjects() {
   const grid = document.getElementById('project-grid');
   if (!grid) return;
@@ -222,24 +247,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let usuarioLogueado = false;
 
-fetch('php/verificar_sesion.php')
-  .then(res => res.json())
-  .then(data => {
-    usuarioLogueado = data.logged_in;
-  });
-
-
-function openModal(destino = null) {
+function openModal(opcion = null) {
   if (usuarioLogueado) {
-    if (destino) window.location.href = destino;
+    // Si ya está logueado y se indica redirección, va de una
+    if (typeof opcion === 'string' && opcion.endsWith('.html')) {
+      window.location.href = opcion;
+    }
     return;
   }
 
   document.getElementById('authModal').classList.remove('hidden');
 
-  // Guarda destino para redirigir después del login
-  if (destino) {
-    sessionStorage.setItem('postLoginRedirect', destino);
+  if (opcion === 'register') {
+    switchToRegister();
+  } else {
+    switchToLogin();
+  }
+
+  // Guardar destino si se pasó como ruta
+  if (typeof opcion === 'string' && opcion.endsWith('.html')) {
+    sessionStorage.setItem('postLoginRedirect', opcion);
   }
 }
 
@@ -260,46 +287,50 @@ function switchToLogin() {
 function handleRegister(e) {
   e.preventDefault();
   const form = e.target;
-  const nombre = form.querySelector('input[type="text"]').value;
-  const email = form.querySelector('input[type="email"]').value;
-  const password = form.querySelector('input[type="password"]').value;
+  const nombre = form.querySelector('input[name="nameregister"]').value;
+  const email = form.querySelector('input[name="emailregister"]').value;
+  const password = form.querySelector('input[name="passwordregister"]').value;
 
-  fetch('php/register.php', {
+  fetch('/api/register', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': csrfToken },
-    body: new URLSearchParams({ nombre, email, telefono: '000000000', password })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      nombre,
+      email,
+      telefono: '000000000',
+      password
+    })
   })
     .then(res => res.json())
     .then(data => {
-      alert(data.msg);
       if (data.status === 'ok') {
+        mostrarToast('📨 Revisa tu correo para verificar tu cuenta', 'ok');
         switchToLogin();
+      } else if (data.msg === 'El correo ya está registrado') {
+        mostrarToast('⚠️ Ese correo ya está en uso', 'error');
+      } else {
+        mostrarToast(data.msg || 'Error al registrarse', 'error');
       }
-    });
+    })
+    .catch(() => mostrarToast('Error de conexión al registrar', 'error'));
 }
-
 
 function handleLogin(e) {
   e.preventDefault();
   const form = e.target;
-  const email = form.querySelector('input[type="email"]').value;
-  const password = form.querySelector('input[type="password"]').value;
+  const email = form.querySelector('input[name="emaillogin"]').value;
+  const password = form.querySelector('input[name="passwordlogin"]').value;
 
-  fetch('php/login.php', {
+  fetch('/api/login', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': csrfToken },
-    body: new URLSearchParams({ email, password })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
   })
     .then(res => res.json())
     .then(data => {
-      alert(data.msg);
       if (data.status === 'ok') {
-        if (data.token) {
-          csrfToken = data.token;
-          document.querySelectorAll('input[name="csrf_token"]').forEach(el => el.value = csrfToken);
-        }
+        localStorage.setItem('vendraly_token', data.token);
         closeModal();
-
         const destino = sessionStorage.getItem('postLoginRedirect');
         if (destino) {
           sessionStorage.removeItem('postLoginRedirect');
@@ -307,36 +338,53 @@ function handleLogin(e) {
         } else {
           window.location.href = 'dashboard/oportunidades.html';
         }
+      } else if (data.msg === 'Correo no verificado') {
+        mostrarToast('📧 Verifica tu correo antes de iniciar sesión', 'error');
+      } else {
+        mostrarToast(data.msg || 'Credenciales incorrectas', 'error');
       }
-    });
+    })
+    .catch(() => mostrarToast('Error al iniciar sesión', 'error'));
 }
 
 
 function checkAuthAndRedirect(url) {
-  fetch('php/verificar_sesion.php')
+  fetch('/api/verificar_sesion', {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('vendraly_token')
+    }
+  })
     .then(res => res.json())
     .then(data => {
       if (data.logged_in) {
         window.location.href = url;
       } else {
-        openModal(); // Muestra el modal si NO está logeado
+        openModal();
       }
     })
-    .catch(err => {
-      console.error("Error verificando sesión:", err);
-      openModal(); // Por si acaso, muestra el modal si algo falla
+    .catch(() => openModal());
+}
+
+function checkLoginStatus() {
+  fetch('/api/verificar_sesion', {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('vendraly_token')
+    }
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.logged_in) {
+        document.getElementById('authButtons').classList.add('hidden');
+        document.getElementById('userPanel').classList.remove('hidden');
+        document.getElementById('userName').innerText = `Hola, ${data.nombre}`;
+        usuarioLogueado = true;
+      }
     });
 }
 
-// Redirige automáticamente si ya estás logueado y entras en index.html
-fetch('php/verificar_sesion.php')
-  .then(res => res.json())
-  .then(data => {
-    if (data.logged_in) {
-      sessionStorage.setItem('usuarioLogueado', '1');
-      const esIndex = window.location.pathname.endsWith('/index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/vendraly/');
-      if (esIndex) {
-        window.location.href = 'dashboard/oportunidades.html';
-      }
-    }
-  });
+function logout() {
+  localStorage.removeItem('vendraly_token');
+  location.reload();
+}
+
+checkLoginStatus();

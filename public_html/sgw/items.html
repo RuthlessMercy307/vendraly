@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGW</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="css/items.css">
+
+    <script src="https://kit.fontawesome.com/39116ae592.js" crossorigin="anonymous"></script>
+</head>
+<body id="body">
+    
+    <header>
+        <div class="icon__menu">
+            <i class="fas fa-bars" id="btn_open"></i>
+        </div>
+    </header>
+
+    <div class="menu__side" id="menu_side">
+
+        <div class="name__page">
+            <i class="fas fa-store"></i>
+            <h4 style="margin-left:10px;">SGW Vendraly</h4>
+        </div>
+
+        <div class="options__menu">	
+
+            <a href="#" onclick="cargarSeccion('mesas')">
+                <div class="option">
+                <i class="fas fa-chair" title="Mesas"></i>
+                <h4>Mesas</h4>
+                </div>
+            </a>
+
+            <a href="#" onclick="cargarSeccion('delivery')">
+                <div class="option">
+                <i class="fas fa-motorcycle" title="Delivery"></i>
+                <h4>Delivery</h4>
+                </div>
+            </a>
+            
+            <a href="#" class="selected" onclick="cargarSeccion('items')">
+                <div class="option">
+                <i class="fas fa-boxes" title="Items"></i>
+                <h4>Items</h4>
+                </div>
+            </a>
+
+            <a href="#" onclick="cargarSeccion('usuarios')">
+                <div class="option">
+                <i class="fas fa-user-friends" title="Usuarios"></i>
+                <h4>Usuarios</h4>
+                </div>
+            </a>
+
+            <a href="#" onclick="cargarSeccion('historial')">
+                <div class="option">
+                <i class="fas fa-history" title="Historial"></i>
+                <h4>Historial</h4>
+                </div>
+            </a>
+
+            <a href="#" onclick="cargarSeccion('ia')">
+                <div class="option">
+                <i class="fas fa-robot" title="IA"></i>
+                <h4>IA</h4>
+                </div>
+            </a>
+
+            <a href="#" onclick="cargarSeccion('configuracion')">
+                <div class="option">
+                <i class="fas fa-cogs" title="Configuración"></i>
+                <h4>Configuración</h4>
+                </div>
+            </a>
+
+            <a href="#" onclick="cargarSeccion('cerrar')">
+                <div class="option">
+                <i class="fas fa-sign-out-alt" title="Cerrar Sesión"></i>
+                <h4>Cerrar Sesión</h4>
+                </div>
+            </a>
+
+            </div>
+    </div>
+
+    <main class="inventario-wrapper">
+  <section class="inventario-header">
+    <h2>Inventario del Negocio</h2>
+    <button class="btn-novo" onclick="abrirModalNovoItem()">+ Nuevo Producto</button>
+  </section>
+
+  <div class="inventario-kanban" id="lista-inventario">
+    <div class="kanban-columna" id="columna-productos">
+      <h3>Productos</h3>
+    </div>
+    <div class="kanban-columna" id="columna-insumos">
+      <h3>Insumos</h3>
+    </div>
+    <div class="kanban-columna" id="columna-combos">
+      <h3>Combos</h3>
+    </div>
+  </div>
+
+  <div id="modal-item" class="modal hidden">
+    <div class="modal-content">
+      <button class="btn-fechar" onclick="fecharModalItem()">✖</button>
+      <h3 id="titulo-modal">Nuevo Producto</h3>
+      <form id="form-item">
+        <input type="hidden" name="id">
+        <label>Nombre: <input type="text" name="nome" required></label>
+        <label>Descripción: <textarea name="descripcion" placeholder="Describe el producto"></textarea></label>
+        <label>Tipo:
+          <select name="tipo" required>
+            <option value="producto">Producto</option>
+            <option value="insumo">Insumo</option>
+            <option value="combo">Combo</option>
+          </select>
+        </label>
+        <label>Precio de Costo: <input type="number" name="preco_custo" step="0.01" required></label>
+        <label>Precio de Venta: <input type="number" name="preco_venda" step="0.01"></label>
+        <label>Stock Actual: <input type="number" name="stock_atual" required></label>
+        <label>Stock Mínimo: <input type="number" name="stock_minimo"></label>
+        <label>Unidad de Medida: <input type="text" name="unidade" placeholder="g, ml, unid..."></label>
+        <label>Validez: <input type="date" name="vencimento"></label>
+        <label>Código de Barras: <input type="text" name="codigo_barras"></label>
+        <label>Promoción Activa:
+          <select name="promocao_ativa">
+            <option value="0">No</option>
+            <option value="1">Sí</option>
+          </select>
+        </label>
+        <label>Descuento (%): <input type="number" name="desconto" step="0.01"></label>
+        <div class="modal-buttons">
+          <button type="submit" class="btn-salvar">Guardar</button>
+          <button type="button" onclick="fecharModalItem()" class="btn-cancelar">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <section class="alerta-estoque" id="alerta-estoque"></section>
+
+  <!-- MODAL: Entrada de Inventario -->
+  <div id="modal-entrada" class="modal hidden">
+    <div class="modal-content">
+      <button class="btn-fechar" onclick="document.getElementById('modal-entrada').classList.add('hidden')">✖</button>
+      <h3>Entrada de Inventario</h3>
+      <form id="form-entrada">
+        <label>Producto:
+          <select name="producto_id" required></select>
+        </label>
+        <label>Cantidad:
+          <input type="number" name="cantidad" required>
+        </label>
+        <label>Precio Unitario (R$):
+          <input type="number" name="precio_unitario" step="0.01" required>
+        </label>
+        <button type="submit">Registrar Entrada</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Conversión de Insumos -->
+  <div id="modal-conversao" class="modal hidden">
+    <div class="modal-content">
+      <button class="btn-fechar" onclick="document.getElementById('modal-conversao').classList.add('hidden')">✖</button>
+      <h3>Conversión de Insumos</h3>
+      <form id="form-conversao">
+        <label>De:
+          <select name="insumo_origem" required></select>
+        </label>
+        <label>Cantidad de Origen:
+          <input type="number" name="cantidad_origen" required>
+        </label>
+        <label>Para:
+          <select name="insumo_resultado" required></select>
+        </label>
+        <label>Cantidad Resultante:
+          <input type="number" name="cantidad_resultado" required>
+        </label>
+        <button type="submit">Registrar Conversión</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Receta del Producto -->
+  <div id="modal-receita" class="modal hidden">
+    <div class="modal-content">
+      <button class="btn-fechar" onclick="document.getElementById('modal-receita').classList.add('hidden')">✖</button>
+      <h3>Receta del Producto</h3>
+      <form id="form-receita">
+        <label>Producto Final:
+          <select name="producto_id" required></select>
+        </label>
+        <label>Ingrediente:
+          <select name="insumo_id" required></select>
+        </label>
+        <label>Cantidad Utilizada:
+          <input type="number" name="cantidad_utilizada" required>
+        </label>
+        <button type="submit">Agregar Ingrediente</button>
+      </form>
+      <div id="lista-receita"></div>
+    </div>
+  </div>
+</main>
+
+    <script src="js/items.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

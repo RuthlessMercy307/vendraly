@@ -14,7 +14,7 @@
       <nav class="nav-links">
         <a href="oportunidades.html">Oportunidades</a>
         <a href="crearproyecto.html">Crear Proyecto</a>
-        <a href="mensajes.html">Mensajes</a>
+        <a href="mensajes.html" class="activo">Mensajes</a>
         <a href="portafolio.html">Portafolio</a>
         <a href="cuenta.html">Cuenta</a>
       </nav>
@@ -29,16 +29,16 @@
     <section class="messages">
       <!-- Lista de chats -->
       <div class="chat-list">
-        <input type="text" placeholder="Buscar...">
+        <input type="text" placeholder="Buscar conversaciones...">
         <ul id="listaChats"></ul>
       </div>
 
       <!-- Ventana de conversación -->
       <div class="chat-window">
-        <h3 id="nombreChat">Cargando...</h3>
+        <h3 id="nombreChat">Selecciona un chat</h3>
         <div class="chat-messages" id="contenedorMensajes"></div>
         <form id="mensajeForm" data-conversacion-id="">
-          <input type="text" placeholder="Escribe un mensaje..." required />
+          <input type="text" name="mensaje" placeholder="Escribe un mensaje..." required autocomplete="off" />
           <button class="btn btn-primary" type="submit">Enviar</button>
         </form>
       </div>
@@ -60,7 +60,6 @@
   </footer>
 
   <script src="../js/session.js"></script>
-  <script src="../js/csrf.js"></script>
   <script src="../js/ws.js"></script>
   <script src="../js/mensajes.js"></script>
 </body>
